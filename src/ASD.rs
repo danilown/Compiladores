@@ -15,6 +15,12 @@ const simbolo_soma = 12;
 const simbolo_subtracao = 13;
 const simbolo_or = 14;
 const simbolo_igual = 15;
+const simbolo_menor = 16;
+const simbolo_maior = 17;
+const simbolo_diferente = 18;
+const simbolo_maior_igual = 19;
+const simbolo_menor_igual = 20;
+const simbolo_in = 21;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
