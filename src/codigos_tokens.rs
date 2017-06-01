@@ -8,6 +8,9 @@ const expression: u32 = 5;
 const parameter_list: u32 = 6;
 const statement: u32 = 7;
 const program: u32 = 8;
+const simbolo_virgula = 9;
+const simbolo_fecha_parenteses = 10;
+const simbolo_ponto_ponto = 11;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -19,3 +22,4 @@ const VAIDEN: u32 = 14; // variable identifier
 const FUIDEN: u32 = 15;	// function identifier
 const TYIDEN: u32 = 16;	// type identifier
 const PRIDEN: u32 = 17;	// procedure identifier
+ 
