@@ -11,6 +11,8 @@ const program: u32 = 8;
 const simbolo_virgula = 9;
 const simbolo_fecha_parenteses = 10;
 const simbolo_ponto_ponto = 11;
+const simbolo_soma = 12;
+const simbolo_subtracao = 13;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -67,19 +69,30 @@ fn sitype(){
 			}
 			else {
 				println!("ERRO, PONTO PONTO ESPERADO.");
+			}
 		},
 		_ => 
 			println!("ERRO");
 	}
 }
 
-fn consta(){
+fn consta() {
 	let mut simbolo;
 
 	simbolo = recebe_token();
+	if simbolo == STRING {
+		return;
+	}
 	match simbolo {
-		STRING => expr,
-		None => expr,
+		simbolo_soma => ,
+		simbolo_subtracao => ,
+		_ => ,
+	}
+	simbolo = recebe_token();
+	match simbolo {
+		COIDEN => return,
+		NUMB => return,
+		_ => println!("ERRO, COIDEN OU NUMB ESPERADO."),
 	}
 }
 

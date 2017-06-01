@@ -11,6 +11,8 @@ const program: u32 = 8;
 const simbolo_virgula = 9;
 const simbolo_fecha_parenteses = 10;
 const simbolo_ponto_ponto = 11;
+const simbolo_soma = 12;
+const simbolo_subtracao = 13;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
