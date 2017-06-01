@@ -26,6 +26,11 @@ const simbolo_ponto: u32 = 23;
 const simbolo_arroba: u32 = 24;
 const simbolo_aspas: u32 = 25;
 const simbolo_fecha_colchetes: u32 = 26;
+const simbolo_asterisco: u32 = 27;
+const simbolo_barra: u32 = 28; 
+const simbolo_dif: u32 = 29;
+const simbolo_mod: u32 = 30;
+const simbolo_and: u32 = 31;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -127,6 +132,7 @@ fn infipo(){
 				loop{
 					simbolo = recebe_token();
 					if simbolo == expr {
+						expr();
 						simbolo = recebe_token();
 						match simbolo {
 							simbolo_aspas => continue,
@@ -160,7 +166,25 @@ fn factor(){
 }
 
 fn term(){
+	let mut simbolo;
 
+	loop {
+		simbolo = recebe_token();
+		if simbolo == factor {
+			match simbolo {
+				simbolo_asterisco => continue,
+				simbolo_barra => continue,
+				simbolo_div => continue,
+				simbolo_mod => continue,
+				simbolo_and => continue,
+				_ => break,
+			}
+		}
+		else {
+			println!("ERRO, FACTOR ESPERADO.");
+			break;
+		}
+	}			
 }
 
 fn siexpr(){
