@@ -171,6 +171,7 @@ fn term(){
 	loop {
 		simbolo = recebe_token();
 		if simbolo == factor {
+			factor();
 			match simbolo {
 				simbolo_asterisco => continue,
 				simbolo_barra => continue,
