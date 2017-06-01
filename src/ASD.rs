@@ -21,6 +21,10 @@ const simbolo_diferente = 18;
 const simbolo_maior_igual = 19;
 const simbolo_menor_igual = 20;
 const simbolo_in = 21;
+const simbolo_abre_colchetes = 22;
+const simbolo_ponto = 23;
+const simbolo_arroba = 24;
+const simbolo_aspas = 25;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -113,7 +117,41 @@ fn filist(){
 }
 
 fn infipo(){
+	let mut simbolo;
 
+	loop{
+		simbolo = recebe_token();
+		match simbolo {
+			simbolo_abre_colchetes => {
+				loop{
+					simbolo = recebe_token();
+					if simbolo == expr {
+						simbolo = recebe_token();
+						match simbolo {
+							simbolo_aspas => continue,
+							simbolo_fecha_colchetes => break,
+							_ => println!("ERRO, ASPAS OU FECHA COLCHETES ESPERADO.");
+						}
+					}
+					else {
+						println!("ERRO, EXPR ESPERADO.");
+						return;
+					}
+				}
+			},
+			simbolo_ponto => {
+				simbolo = recebe_token();
+				if simbolo == FIIDEN {
+					continue;
+				}
+				else {
+					println!("ERRO, FIIDEN ESPERADO.");
+				}
+			},
+			simbolo_arroba => continue,
+			_ => break,
+		}
+	}
 }
 
 fn factor(){
