@@ -149,8 +149,6 @@ fn compare(characters:Vec<char>,reserved:Vec<String>,intervals:[[u32;26];2],debu
     //Checa os caracteres do arquivo de entrada
     for i in 0..characters.len() {
 
-        println!("{}", characters[i]);
-
         match test_case(characters[i],controle) {
 
             -1 => {},
@@ -179,6 +177,12 @@ fn compare(characters:Vec<char>,reserved:Vec<String>,intervals:[[u32;26];2],debu
                 continue;
             },
 
+            8 => {
+
+                controle[checker::IS_COMM2 as usize] = !controle[checker::IS_COMM2 as usize];
+                string_completa=true;
+            },
+
             _ => println!("Algo de errado não está certo"),
         }
 
@@ -193,7 +197,7 @@ fn compare(characters:Vec<char>,reserved:Vec<String>,intervals:[[u32;26];2],debu
                 println!("{:?}",auxiliar);
             }
 
-            reserv(&auxiliar,&intervals,&reserved);
+            if auxiliar.chars().next().unwrap() != '\n' { reserv(&auxiliar,&intervals,&reserved); }
             auxiliar=String::new();
             string_completa=false;
         }
@@ -215,8 +219,9 @@ fn test_case (character:char,controle:[bool;6]) -> i8 {
         COMM1 = 3,
         COMM2 = 4,
         COMM3 = 5,
-        ALMOST_COMM2=6,
-        ALMOST_COMM3=7,
+        ALMOST_COMM2 = 6,
+        ALMOST_COMM3 = 7,
+        PRONTO_AND_COMM2 = 8,
     };
 
     enum checker {
@@ -267,7 +272,16 @@ fn test_case (character:char,controle:[bool;6]) -> i8 {
 
         '{' | '}' => return helper::COMM1 as i8,
 
-        '\n' => return helper::STRING_PRONTA as i8,
+        '\n' => {
+
+            if controle[checker::IS_COMM2 as usize] { return helper::PRONTO_AND_COMM2 as i8; }
+
+            else if controle[checker::IS_COMM1 as usize] { return -1 }
+
+            else if controle[checker::IS_COMM3 as usize] { return -1 }
+
+            return helper::STRING_PRONTA as i8
+        },
 
         _ => return helper::CONCATENA_STRING as i8,
     }
