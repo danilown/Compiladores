@@ -2,12 +2,33 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::process::Command;
 
-
 //Checar expressao
 //Identificador
 //Erro: Abre comentario e nao fecha >> fim de arquivo inesperado
 
 //funçao assign, decide o papel do token checas os booleans necessarios
+
+// Codigos para tokens nao terminais
+const constant: u32 = 0;
+const simple_type: u32 = 1;
+const field_list: u32 = 2;
+const index: u32 = 3;
+const simple_expression: u32 = 4;
+const expression: u32 = 5;
+const parameter_list: u32 = 6;
+const statement: u32 = 7;
+const program: u32 = 8;
+
+// Codigos para tokens terminais
+const NUMB: u32 = 9; 	// number
+const STRING: u32 = 10;	// cadeia de caracteres
+const IDEN: u32 = 11;	// identifier
+const COIDEN: u32 = 12;	// constant identifier
+const FIIDEN: u32 = 13;	// filed identifier
+const VAIDEN: u32 = 14; // variable identifier
+const FUIDEN: u32 = 15;	// function identifier
+const TYIDEN: u32 = 16;	// type identifier
+const PRIDEN: u32 = 17;	// procedure identifier
 
 fn main() {
 
@@ -72,9 +93,9 @@ fn arq_res (debug:bool) -> Vec<String> {
 
 /*Pega o valor numérico de um caracter na primeira posição de uma string, que está em um certo indice de um
 vector de strings e retorna esse valor que pode ir de 0 a 36 , 0-9 retorna 0-9, a-z retorna 10-35*/
-fn get_charval_fp (vec:&Vec<String>,index: usize) -> u32 {
+fn get_charval_fp (vec:&Vec<String>,indice: usize) -> u32 {
 
-    vec[index].chars().next().unwrap().to_digit(36).unwrap()
+    vec[indice].chars().next().unwrap().to_digit(36).unwrap()
 }
 
 /*Pega o valor numérico de um caracter na primeira posição de uma string, que está em um certo indice de um
@@ -113,43 +134,66 @@ fn compare(characters:Vec<char>,reserved:Vec<String>,intervals:[[u32;26];2],debu
 
     let mut auxiliar = String::new();
     let mut string_completa=false;
-    let mut is_string=true;
+    let mut controle:[bool;6] = [false;6];
+
+    enum checker {
+
+        IS_STRING=0,
+        IS_COMM1=1,
+        IS_COMM2=2,
+        IS_COMM3=3,
+        ALMOST_COMM2=4,
+        ALMOST_COMM3=5,
+    };
 
     //Checa os caracteres do arquivo de entrada
     for i in 0..characters.len() {
 
-        match characters[i] {
+        println!("{}", characters[i]);
 
-            '\'' => {
+        match test_case(characters[i],controle) {
 
-                is_string= !is_string;
+            -1 => {},
+
+            0 => string_completa=true,
+
+            1 => auxiliar.push(characters[i]),
+
+            2 => controle[checker::IS_STRING as usize] = !controle[checker::IS_STRING as usize],
+
+            3 => controle[checker::IS_COMM1 as usize] = !controle[checker::IS_COMM1 as usize],
+
+            4 => controle[checker::IS_COMM2 as usize] = !controle[checker::IS_COMM2 as usize],
+
+            5 => controle[checker::IS_COMM3 as usize] = !controle[checker::IS_COMM3 as usize],
+
+            6 => {
+
+                controle[checker::ALMOST_COMM2 as usize] = !controle[checker::ALMOST_COMM2 as usize];
+                continue;
             },
 
-            ';' | ':' | '(' | ')' => {
+            7 => {
 
-                //Colocar na tabela
-                string_completa=true;
+                controle[checker::ALMOST_COMM3 as usize] = !controle[checker::ALMOST_COMM3 as usize];
+                continue;
             },
 
-            '.' | ',' => {},
-
-            ' ' | '\n' => string_completa=true,
-
-            _ => auxiliar.push(characters[i]),
+            _ => println!("Algo de errado não está certo"),
         }
+
+        if (controle[checker::ALMOST_COMM2 as usize]) { controle[checker::ALMOST_COMM2 as usize] =false; }
+
+        else if (controle[checker::ALMOST_COMM3 as usize]) { controle[checker::ALMOST_COMM3 as usize] =false; }
 
         if string_completa && auxiliar.len()>0 {
 
-            if debug {  
+            if debug {
 
-                println!("{:?} {}",auxiliar,is_reservada);
+                println!("{:?}",auxiliar);
             }
-            
 
-            if (is_reservada) {
-
-                reserv(&auxiliar,&intervals,&reserved);
-            }
+            reserv(&auxiliar,&intervals,&reserved);
             auxiliar=String::new();
             string_completa=false;
         }
@@ -161,16 +205,84 @@ fn compare(characters:Vec<char>,reserved:Vec<String>,intervals:[[u32;26];2],debu
     }
 }
 
+fn test_case (character:char,controle:[bool;6]) -> i8 {
+
+    enum helper {
+
+        STRING_PRONTA = 0,
+        CONCATENA_STRING = 1,
+        EH_STRING = 2,
+        COMM1 = 3,
+        COMM2 = 4,
+        COMM3 = 5,
+        ALMOST_COMM2=6,
+        ALMOST_COMM3=7,
+    };
+
+    enum checker {
+
+        IS_STRING=0,
+        IS_COMM1=1,
+        IS_COMM2=2,
+        IS_COMM3=3,
+        ALMOST_COMM2=4,
+        ALMOST_COMM3=5,
+    };
+
+    match character {
+
+        '\'' => {
+
+            return helper::EH_STRING as i8;
+        },
+
+        ';' | ':' | ' ' | '.' | ',' => {
+
+            if controle[checker::IS_STRING as usize] { return helper::CONCATENA_STRING as i8; }
+
+            else if controle[checker::IS_COMM1 as usize] { return helper::CONCATENA_STRING as i8; }
+
+            else if controle[checker::IS_COMM2 as usize] { return helper::CONCATENA_STRING as i8; }
+
+            else if controle[checker::IS_COMM3 as usize] { return helper::CONCATENA_STRING as i8; }
+
+            else { return helper::STRING_PRONTA as i8; }
+        },
+
+        '/' => {
+
+            if controle[checker::ALMOST_COMM2 as usize] { return helper::COMM2 as i8; }
+
+            else { return helper::ALMOST_COMM2 as i8; }
+        }
+
+        '(' | ')' => return helper::ALMOST_COMM3 as i8,
+
+        '*' => {
+
+            if controle[checker::ALMOST_COMM3 as usize] { return helper::COMM3 as i8; }
+
+            else { return -1; }
+        },
+
+        '{' | '}' => return helper::COMM1 as i8,
+
+        '\n' => return helper::STRING_PRONTA as i8,
+
+        _ => return helper::CONCATENA_STRING as i8,
+    }
+}
+
 fn reserv(auxiliar:&String,intervals:&[[u32;26];2],reserved:&Vec<String>) {
 
     let mut inter_init=0;
     let mut inter_final=0;
-    let mut index;
+    let mut indice;
 
-    index = pegar_char(&auxiliar) -10;
-    inter_init=intervals[0 as usize][index as usize];
-    inter_final=intervals[1 as usize][index as usize];
-                
+    indice = pegar_char(&auxiliar) -10;
+    inter_init=intervals[0 as usize][indice as usize];
+    inter_final=intervals[1 as usize][indice as usize];
+
     //Se o intervalo começar e terminar com 0, não há palavra reservada que começe com essa letra, logo não é reservada
     if inter_init==inter_final && inter_init==0 {
 
@@ -179,7 +291,7 @@ fn reserv(auxiliar:&String,intervals:&[[u32;26];2],reserved:&Vec<String>) {
 
     //Checa dentro do intervalo de possibilidade
     for i in inter_init .. inter_final+1 {
-        
+
         if reserved[i as usize] == auxiliar.to_lowercase().to_string() {
             println!("sucesso");
             return;
