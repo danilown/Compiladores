@@ -13,6 +13,8 @@ const simbolo_fecha_parenteses = 10;
 const simbolo_ponto_ponto = 11;
 const simbolo_soma = 12;
 const simbolo_subtracao = 13;
+const simbolo_or = 14;
+const simbolo_igual = 15;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -117,11 +119,60 @@ fn term(){
 }
 
 fn siexpr(){
+	let mut simbolo;
 
+	simbolo = recebe_token();
+	match simbolo {
+		simbolo_soma => ,
+		simbolo_subtracao => ,
+		_ => ,
+	}
+	loop {
+		simbolo = recebe_token();
+		if simbolo == term {
+			term();
+			match simbolo {
+				simbolo_soma => continue,
+				simbolo_subtracao => continue,
+				simbolo_or => continue,
+				_ => break;
+			}
+		}
+		else {
+			println!("ERRO, TERM ESPERADO.");
+		}
+	}
 }
 
 fn expr(){
+	let mut simbolo;
 
+	simbolo = recebe_token();
+	if simbolo == siexpr {
+		siexpr();
+		simbolo = recebe_token();
+		match simbolo {
+			simbolo_igual => ,
+			simbolo_menor => ,
+			simbolo_maior => ,
+			simbolo_diferente => ,
+			simbolo_maior_igual => ,
+			simbolo_menor_igual => ,
+			simbolo_in => ,
+			_ => return,
+		}
+	}
+	else{
+		println!("ERRO, SIEXPR ESPERADO.");
+		return;
+	}
+	simbolo = recebe_token();
+	if simbolo = siexpr {
+		siexpr();
+	}
+	else{
+		println!("ERRO, SIEXPR ESPERADO.");
+	}
 }
 
 fn palist(){
