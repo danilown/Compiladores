@@ -52,17 +52,27 @@ fn sitype(){
 
 	simbolo = recebe_token();
 	match simbolo {
-		TYIDEN => 
-			return,
+		TYIDEN => {
+			consome_token();
+			return;
+		},
 
 		simbolo_abre_parenteses => {
+			consome_token();
 			loop {
 				simbolo = recebe_token();
 				if simbolo == IDEN {
+					consome_token();
 					simbolo = recebe_token();
 					match simbolo {
-						simbolo_virgula => continue,
-						simbolo_fecha_parenteses => break,
+						simbolo_virgula => {
+							consome_token();
+							continue;
+						},
+						simbolo_fecha_parenteses => {
+							consome_token();
+							break;
+						},
 						_ => println!("ERRO, VIRGULA OU FECHA PARENTESES ESPERADO."),
 
 					}
@@ -73,24 +83,17 @@ fn sitype(){
 			}
 		},
 
-		constant => {
+		_ => {
 			consta();
 			simbolo = recebe_token();
 			if simbolo == simbolo_ponto_ponto {
-				simbolo = recebe_token();
-				if simbolo == constant {
-					consta();
-				}
-				else {
-					println!("ERRO, CONSTANT ESPERADO.");
-				}
+				consome_token();
+				consta();
 			}
 			else {
 				println!("ERRO, PONTO PONTO ESPERADO.");
 			}
 		},
-		_ => 
-			println!("ERRO");
 	}
 }
 
@@ -129,33 +132,38 @@ fn infipo(){
 		simbolo = recebe_token();
 		match simbolo {
 			simbolo_abre_colchetes => {
+				consome_token();
 				loop{
+					expr();
 					simbolo = recebe_token();
-					if simbolo == expr {
-						expr();
-						simbolo = recebe_token();
-						match simbolo {
-							simbolo_aspas => continue,
-							simbolo_fecha_colchetes => break,
-							_ => println!("ERRO, ASPAS OU FECHA COLCHETES ESPERADO.");
-						}
-					}
-					else {
-						println!("ERRO, EXPR ESPERADO.");
-						return;
+					match simbolo {
+						simbolo_aspas => {
+							consome_token();
+							continue;
+						},
+						simbolo_fecha_colchetes => {
+							consome_token();
+							break;
+						},
+						_ => println!("ERRO, ASPAS OU FECHA COLCHETES ESPERADO.");
 					}
 				}
 			},
 			simbolo_ponto => {
+				consome_token();
 				simbolo = recebe_token();
 				if simbolo == FIIDEN {
+					consome_token();
 					continue;
 				}
 				else {
 					println!("ERRO, FIIDEN ESPERADO.");
 				}
 			},
-			simbolo_arroba => continue,
+			simbolo_arroba => {
+				consome_token();
+				continue;
+			},
 			_ => break,
 		}
 	}
@@ -169,21 +177,30 @@ fn term(){
 	let mut simbolo;
 
 	loop {
+		factor();
 		simbolo = recebe_token();
-		if simbolo == factor {
-			factor();
-			match simbolo {
-				simbolo_asterisco => continue,
-				simbolo_barra => continue,
-				simbolo_div => continue,
-				simbolo_mod => continue,
-				simbolo_and => continue,
-				_ => break,
-			}
-		}
-		else {
-			println!("ERRO, FACTOR ESPERADO.");
-			break;
+		match simbolo {
+			simbolo_asterisco => {
+				consome_token();
+				continue;
+			},
+			simbolo_barra => {
+				consome_token();
+				continue;
+			},
+			simbolo_div => {
+				consome_token();
+				continue;
+			},
+			simbolo_mod => {
+				consome_token();
+				continue;
+			},
+			simbolo_and => {
+				consome_token();
+				continue;
+			},
+			_ => break,
 		}
 	}			
 }
@@ -197,19 +214,24 @@ fn siexpr(){
 		simbolo_subtracao => ,
 		_ => ,
 	}
+	consome_token();
 	loop {
+		term();
 		simbolo = recebe_token();
-		if simbolo == term {
-			term();
-			match simbolo {
-				simbolo_soma => continue,
-				simbolo_subtracao => continue,
-				simbolo_or => continue,
-				_ => break;
-			}
-		}
-		else {
-			println!("ERRO, TERM ESPERADO.");
+		match simbolo {
+			simbolo_soma => {
+				consome_token();
+				continue;
+			},
+			simbolo_subtracao => {
+				consome_token();
+				continue;
+			},
+			simbolo_or => {
+				consome_token();
+				continue;
+			},
+			_ => break;
 		}
 	}
 }
@@ -217,32 +239,20 @@ fn siexpr(){
 fn expr(){
 	let mut simbolo;
 
+
+	siexpr();
 	simbolo = recebe_token();
-	if simbolo == siexpr {
-		siexpr();
-		simbolo = recebe_token();
-		match simbolo {
-			simbolo_igual => ,
-			simbolo_menor => ,
-			simbolo_maior => ,
-			simbolo_diferente => ,
-			simbolo_maior_igual => ,
-			simbolo_menor_igual => ,
-			simbolo_in => ,
-			_ => return,
-		}
+	match simbolo {
+		simbolo_igual => consome_token(),
+		simbolo_menor => consome_token(),
+		simbolo_maior => consome_token(),
+		simbolo_diferente => consome_token(),
+		simbolo_maior_igual => consome_token(),
+		simbolo_menor_igual => consome_token(),
+		simbolo_in => ,
+		_ => return,
 	}
-	else{
-		println!("ERRO, SIEXPR ESPERADO.");
-		return;
-	}
-	simbolo = recebe_token();
-	if simbolo = siexpr {
-		siexpr();
-	}
-	else{
-		println!("ERRO, SIEXPR ESPERADO.");
-	}
+	siexpr();
 }
 
 fn palist(){
