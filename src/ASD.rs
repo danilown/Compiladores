@@ -60,25 +60,23 @@ fn sitype(){
 		simbolo_abre_parenteses => {
 			consome_token();
 			loop {
-				simbolo = recebe_token();
+				simbolo = consome_token();
 				if simbolo == IDEN {
-					consome_token();
-					simbolo = recebe_token();
+					simbolo = consome_token();
 					match simbolo {
-						simbolo_virgula => {
-							consome_token();
-							continue;
-						},
-						simbolo_fecha_parenteses => {
-							consome_token();
-							break;
-						},
-						_ => println!("ERRO, VIRGULA OU FECHA PARENTESES ESPERADO."),
+						simbolo_virgula => continue,
 
+						simbolo_fecha_parenteses => break,
+
+						_ => {
+							println!("ERRO, VIRGULA OU FECHA PARENTESES ESPERADO.");
+							return;
+						},
 					}
 				}
 				else {
 					println!("ERRO, IDENFIER ESPERADO.");
+					return
 				}
 			}
 		},
@@ -92,6 +90,7 @@ fn sitype(){
 			}
 			else {
 				println!("ERRO, PONTO PONTO ESPERADO.");
+				return;
 			}
 		},
 	}
@@ -100,20 +99,27 @@ fn sitype(){
 fn consta() {
 	let mut simbolo;
 
-	simbolo = recebe_token();
+	simbolo = consome_token();
 	if simbolo == STRING {
 		return;
 	}
 	match simbolo {
 		simbolo_soma => ,
+
 		simbolo_subtracao => ,
+
 		_ => ,
 	}
-	simbolo = recebe_token();
+	simbolo = consome_token();
 	match simbolo {
 		COIDEN => return,
+
 		NUMB => return,
-		_ => println!("ERRO, COIDEN OU NUMB ESPERADO."),
+
+		_ => {
+			println!("ERRO, COIDEN OU NUMB ESPERADO.");
+			return;
+		},
 	}
 }
 
@@ -135,31 +141,32 @@ fn infipo(){
 				consome_token();
 				loop{
 					expr();
-					simbolo = recebe_token();
+					simbolo = consome_token();
 					match simbolo {
-						simbolo_aspas => {
-							consome_token();
-							continue;
+						simbolo_aspas => continue,
+
+						simbolo_fecha_colchetes => break,
+
+						_ => {
+							println!("ERRO, ASPAS OU FECHA COLCHETES ESPERADO.");
+							return;
 						},
-						simbolo_fecha_colchetes => {
-							consome_token();
-							break;
-						},
-						_ => println!("ERRO, ASPAS OU FECHA COLCHETES ESPERADO.");
 					}
 				}
 			},
+
 			simbolo_ponto => {
 				consome_token();
-				simbolo = recebe_token();
+				simbolo = consome_token();
 				if simbolo == FIIDEN {
-					consome_token();
 					continue;
 				}
 				else {
 					println!("ERRO, FIIDEN ESPERADO.");
+					return;
 				}
 			},
+
 			simbolo_arroba => {
 				consome_token();
 				continue;
@@ -184,22 +191,27 @@ fn term(){
 				consome_token();
 				continue;
 			},
+
 			simbolo_barra => {
 				consome_token();
 				continue;
 			},
+
 			simbolo_div => {
 				consome_token();
 				continue;
 			},
+
 			simbolo_mod => {
 				consome_token();
 				continue;
 			},
+
 			simbolo_and => {
 				consome_token();
 				continue;
 			},
+
 			_ => break,
 		}
 	}			
@@ -210,11 +222,12 @@ fn siexpr(){
 
 	simbolo = recebe_token();
 	match simbolo {
-		simbolo_soma => ,
-		simbolo_subtracao => ,
+		simbolo_soma => consome_token(),
+
+		simbolo_subtracao => consome_token(),
+
 		_ => ,
 	}
-	consome_token();
 	loop {
 		term();
 		simbolo = recebe_token();
@@ -223,14 +236,17 @@ fn siexpr(){
 				consome_token();
 				continue;
 			},
+
 			simbolo_subtracao => {
 				consome_token();
 				continue;
 			},
+
 			simbolo_or => {
 				consome_token();
 				continue;
 			},
+
 			_ => break;
 		}
 	}
@@ -239,17 +255,23 @@ fn siexpr(){
 fn expr(){
 	let mut simbolo;
 
-
 	siexpr();
 	simbolo = recebe_token();
 	match simbolo {
 		simbolo_igual => consome_token(),
+
 		simbolo_menor => consome_token(),
+
 		simbolo_maior => consome_token(),
+
 		simbolo_diferente => consome_token(),
+
 		simbolo_maior_igual => consome_token(),
+		
 		simbolo_menor_igual => consome_token(),
-		simbolo_in => ,
+		
+		simbolo_in => consome_token(),
+		
 		_ => return,
 	}
 	siexpr();
