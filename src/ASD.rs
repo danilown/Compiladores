@@ -27,10 +27,11 @@ const simbolo_arroba: u32 = 24;
 const simbolo_aspas: u32 = 25;
 const simbolo_fecha_colchetes: u32 = 26;
 const simbolo_asterisco: u32 = 27;
-const simbolo_barra: u32 = 28; 
+const simbolo_barra: u32 = 28;
 const simbolo_dif: u32 = 29;
 const simbolo_mod: u32 = 30;
 const simbolo_and: u32 = 31;
+const simbolo_packed: u32 = 32;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -45,7 +46,7 @@ const PRIDEN: u32 = 17;	// procedure identifier
 
 fn asd(){
 
-} 
+}
 
 fn sitype(){
 	let mut simbolo;
@@ -59,14 +60,19 @@ fn sitype(){
 
 		simbolo_abre_parenteses => {
 			consome_token();
+			/* MEPA 101 */
 			loop {
 				simbolo = consome_token();
 				if simbolo == IDEN {
+					/* MEPA 011 */
 					simbolo = consome_token();
 					match simbolo {
 						simbolo_virgula => continue,
 
-						simbolo_fecha_parenteses => break,
+						simbolo_fecha_parenteses => {
+							/* MEPA 002 */
+							return;
+						},
 
 						_ => {
 							println!("ERRO, VIRGULA OU FECHA PARENTESES ESPERADO.");
@@ -87,6 +93,8 @@ fn sitype(){
 			if simbolo == simbolo_ponto_ponto {
 				consome_token();
 				consta();
+				/* MEPA 103 */
+				return;
 			}
 			else {
 				println!("ERRO, PONTO PONTO ESPERADO.");
@@ -112,9 +120,15 @@ fn consta() {
 	}
 	simbolo = consome_token();
 	match simbolo {
-		COIDEN => return,
+		COIDEN => {
+			/* MEPA 071 */
+			return;
+		},
 
-		NUMB => return,
+		NUMB => {
+			/* MEPA 072 */
+			return;
+		},
 
 		_ => {
 			println!("ERRO, COIDEN OU NUMB ESPERADO.");
@@ -123,8 +137,28 @@ fn consta() {
 	}
 }
 
-fn type(){
+fn type() {
+	let mut simbolo;
 
+	simbolo = recebe_token();
+	match simbolo {
+		simbolo_arroba => {
+			consome_token();
+			simbolo = recebe_token();
+			if simbolo == TYIDEN {
+				/* MEPA 111  */
+				return;
+			}
+			else {
+				println!("ERRO, TYIDEN ESPERADO.");
+				return;
+			}
+		},
+
+		simbolo_packed => {
+
+		},
+	}
 }
 
 fn filist(){
@@ -214,7 +248,7 @@ fn term(){
 
 			_ => break,
 		}
-	}			
+	}
 }
 
 fn siexpr(){
@@ -267,11 +301,11 @@ fn expr(){
 		simbolo_diferente => consome_token(),
 
 		simbolo_maior_igual => consome_token(),
-		
+
 		simbolo_menor_igual => consome_token(),
-		
+
 		simbolo_in => consome_token(),
-		
+
 		_ => return,
 	}
 	siexpr();
