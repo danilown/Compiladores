@@ -48,7 +48,7 @@ fn asd(){
 
 }
 
-fn sitype(){
+fn sitype() {
 	let mut simbolo;
 
 	simbolo = recebe_token();
@@ -161,11 +161,11 @@ fn type() {
 	}
 }
 
-fn filist(){
+fn filist() {
 
 }
 
-fn infipo(){
+fn infipo() {
 	let mut simbolo;
 
 	loop{
@@ -210,11 +210,11 @@ fn infipo(){
 	}
 }
 
-fn factor(){
+fn factor() {
 
 }
 
-fn term(){
+fn term() {
 	let mut simbolo;
 
 	loop {
@@ -251,7 +251,7 @@ fn term(){
 	}
 }
 
-fn siexpr(){
+fn siexpr() {
 	let mut simbolo;
 
 	simbolo = recebe_token();
@@ -286,7 +286,7 @@ fn siexpr(){
 	}
 }
 
-fn expr(){
+fn expr() {
 	let mut simbolo;
 
 	siexpr();
@@ -311,18 +311,18 @@ fn expr(){
 	siexpr();
 }
 
-fn palist(){
+fn palist() {
 
 }
 
-fn block(){
+fn block() {
 
 }
 
-fn statm(){
+fn statm() {
 
 }
 
-fn progrm(){
+fn progrm() {
 
 }
