@@ -37,6 +37,7 @@ const simbolo_of: u32 = 34;
 const simbolo_file: u32 = 35;
 const simbolo_set: u32 = 36;
 const simbolo_end: u32 = 37;
+const simbolo_ponto_virgula: u32 = 38;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -222,7 +223,7 @@ fn type() {
 			}
 			else {
 				println!("ERRO, 'OF' ESPERADO!");
-			}	
+			}
 		},
 
 		simbolo_record => {
@@ -411,5 +412,51 @@ fn statm() {
 }
 
 fn progrm() {
+	let mut simbolo = consome_token();
 
+	if simbolo == IDEN {
+		simbolo = consome_token();
+		if simbolo == simbolo_abre_parenteses {
+			loop {
+				simbolo = consome_token();
+				if simbolo == IDEN {
+					simbolo = consome_token();
+					match simbolo {
+						simbolo_virgula => continue,
+
+						simbolo_fecha_parenteses => break,
+
+						_ => {
+							println!("ERRO, VIRGULA OU FECHA PARENTESES ESPERADO!");
+							return;
+						},
+					}
+				}
+				else {
+					println!("ERRO, IDEN ESPERADO!");
+					return;
+				}
+			}
+			simbolo = consome_token();
+			if simbolo == simbolo_ponto_virgula {
+				block();
+				simbolo = consome_token();
+				if simbolo == simbolo_ponto {
+					return;
+				}
+				else {
+					println!("ERRO, PONTO ESPERADO!");
+					return;
+				}
+			}
+			else {
+				println!("ERRO, PONTO E VIRGULA ESPERADO!");
+				return;
+			}
+		}
+	}
+	else{
+		println!("ERRO, IDEN ESPERADO!");
+		return;
+	}
 }
