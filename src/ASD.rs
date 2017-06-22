@@ -32,6 +32,11 @@ const simbolo_dif: u32 = 29;
 const simbolo_mod: u32 = 30;
 const simbolo_and: u32 = 31;
 const simbolo_packed: u32 = 32;
+const simbolo_array: u32 = 33;
+const simbolo_of: u32 = 34;
+const simbolo_file: u32 = 35;
+const simbolo_set: u32 = 36;
+const simbolo_end: u32 = 37;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -155,10 +160,92 @@ fn type() {
 			}
 		},
 
-		simbolo_packed => {
+		simbolo_packed => consome_token(),
+
+		_ => ,
+	}
+
+	simbolo = recebe_token();
+	match simbolo {
+		simbolo_array => {
+			consome_token();
+			/* MEPA 114 */
+			simbolo = consome_token();
+			if simbolo == simbolo_abre_colchetes {
+				loop {
+					sitype();
+					/* MEPA 115 */
+					simbolo = consome_token();
+					match simbolo {
+						simbolo_virgula =>  continue,
+						simbolo_fecha_colchetes => break,
+					}
+				}
+				simbolo = consome_token();
+				if simbolo == simbolo_of {
+					/* MEPA 116 */
+					type();
+					/* MEPA 117 */
+					return;
+				}
+				else {
+					println!("ERRO, 'OF' ESPERADO!");
+					return;
+				}
+			}
+			else {
+				println!("ERRO, ABRE COLCHETES ESPERADO!");
+				return;
+			}
+		},
+
+		simbolo_file => {
+			consome_token();
+			simbolo = consome_token();
+			if simbolo == simbolo_of {
+				type();
+				/* MEPA 113 */
+				return;
+			}
+			else {
+				println!("ERRO, 'OF' ESPERADO!");
+			}
+		},
+
+		simbolo_set => {
+			consome_token();
+			simbolo = consome_token();
+			if simbolo == simbolo_of {
+				sitype();
+				/* MEPA 112 */
+				return;
+			}
+			else {
+				println!("ERRO, 'OF' ESPERADO!");
+			}	
+		},
+
+		simbolo_record => {
+			consome_token();
+			/* MEPA 121 */
+			filist();
+			/* MEPA 122 */
+			simbolo = consome_token();
+			if simbolo == simbolo_end {
+				return;
+			}
+			else {
+				println!("ERRO, 'END' ESPERADO!");
+			}
 
 		},
+
+		_ => {
+			sitype();
+			return;
+		},
 	}
+
 }
 
 fn filist() {
