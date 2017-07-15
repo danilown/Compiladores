@@ -38,6 +38,8 @@ const simbolo_file: u32 = 35;
 const simbolo_set: u32 = 36;
 const simbolo_end: u32 = 37;
 const simbolo_ponto_virgula: u32 = 38;
+const simbolo_dois_pontos: u32 = 39;
+const simbolo_case: u32 = 40;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -250,7 +252,160 @@ fn type() {
 }
 
 fn filist() {
+	let mut simbolo;
 
+	loop {
+		simbolo = consome_token();
+
+		if simbolo == IDEN {
+			/* MEPA 030 */
+			simbolo = consome_token();
+			if simbolo == simbolo_virgula {
+				continue;
+			}
+			else {
+				if simbolo = simbolo_dois_pontos {
+					/* MEPA 102 */
+					type();
+				}
+				else {
+					println!("ERRO, DOIS PONTOS OU VIRGULA ESPERADO.");
+					return;
+				}
+			}
+		}
+		simbolo = consome_token();
+		if simbolo == simbolo_ponto_virgula {
+			continue;
+		}
+		else {
+			break;
+		}
+	}
+
+	if simbolo == simbolo_case {
+		/* MEPA 001 */
+		simbolo = consome_token();
+		if simbolo == IDEN {
+			simbolo = consome_token();
+			if simbolo != simbolo_virgula {
+				println!("ERRO, VIRGULA ESPERADA.");
+				return;
+			}
+		}
+		simbolo = consome_token();
+		if simbolo != simbolo_lambda {
+			println!("ERRO, LAMBDA ESPERADA.");
+			return;
+		}
+		/* MEPA 002 */
+		simbolo = consome_token();
+		if simbolo != TYIDEN {
+			println!("ERRO, TYIDEN ESPERADO.");
+			return;
+		}
+		/* MEPA 132 */
+		simbolo = consome_token();
+		if simbolo != simbolo_of {
+			println!("ERRO, 'OF' ESPERADO.");
+			return;
+		}
+		loop {
+			simbolo = consome_token();
+			match simbolo {
+				STRING => ,
+
+				simbolo_soma => {
+					simbolo = consome_token();
+					match simbolo {
+						COIDEN => ,
+						NUMB => ,
+						_ => {
+							println!("ERRO, COIDEN ou NUMB ESPERADO.");
+							return;
+						},
+					}
+				},
+
+				simbolo_subtracao => {
+					simbolo = consome_token();
+					match simbolo {
+						COIDEN => ,
+						NUMB => ,
+						_ => {
+							println!("ERRO, COIDEN ou NUMB ESPERADO.");
+							return;
+						},
+					}
+				},
+
+				COIDEN => ,
+				NUMB => ,
+				_ => {
+					simbolo = consome_token();
+					match simbolo {
+						simbolo_ponto_virgula => continue,
+						simbolo_lambda => {
+							/* MEPA 135 */
+							return;
+						},
+						_ => {
+							println!("ERRO, PONTO E VIRGULA OU LAMBDA ESPERADO.");
+							return;
+						},
+					}
+				},
+			}
+			simbolo = consome_token();
+			match simbolo {
+				simbolo_virgula => continue,
+				simbolo_dois_pontos => {
+					/* MEPA 133 */
+					simbolo = consome_token();
+					if simbolo != simbolo_abre_parenteses {
+						println!("ERRO, ABRE PARENTESES ESPERADO.");
+						return;
+					}
+					/* MEPA 001 */
+					filist()
+					/* MEPA 134 */
+					simbolo = consome_token();
+					if simbolo != simbolo_fecha_parenteses {
+						println!("ERRO, FECHA PARENTESES ESPERADO.");
+						return;
+					}
+				},
+				_ => {
+					println!("ERRO, VIRGULA OU DOIS PONTOS ESPERADO.");
+					return;
+				},
+			}
+
+			simbolo = consome_token();
+			match simbolo {
+				simbolo_ponto_virgula => continue,
+				simbolo_lambda => {
+					/* MEPA 135 */
+					return;
+				},
+				_ => {
+					println!("ERRO, PONTO E VIRGULA OU LAMBDA ESPERADO.");
+					return;
+				},
+			}
+			
+		}
+	}
+	else {
+		if simbolo == simbolo_lambda {
+			/* MEPA 131 */
+			return;
+		}
+		else {
+			println!("ERRO, CASE OU LAMBDA ESPERADO.");
+			return;
+		}
+	}
 }
 
 fn infipo() {
