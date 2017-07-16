@@ -41,6 +41,8 @@ const simbolo_ponto_virgula: u32 = 38;
 const simbolo_dois_pontos: u32 = 39;
 const simbolo_case: u32 = 40;
 const simbolo_lambda: u32 = 41;
+const simbolo_nil: u32 = 42;
+const simbolo_not: u32 = 43;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -249,7 +251,6 @@ fn type() {
 			return;
 		},
 	}
-
 }
 
 fn filist() {
@@ -455,7 +456,108 @@ fn infipo() {
 }
 
 fn factor() {
+	let mut simbolo;
 
+	simbolo = consome_token();
+	match simbolo {
+		COIDEN => return,
+		NUMB => {
+			/* MEPA 073 */
+			return;
+		},
+
+		simbolo_nil => {
+			/* MEPA 110 */
+			return;
+		},
+
+		STRING => return,
+		VAIDEN => {
+			/* MEPA 170 */
+			infipo();
+			/* MEPA 167 */
+			return;
+		},
+
+		FUIDEN => {
+			/* MEPA 077 */
+			simbolo = consome_token();
+			match simbolo {
+				simbolo_abre_parenteses => {
+					loop {
+						expr();
+						/* MEPA 078 */
+						simbolo = consome_token();
+						match simbolo {
+							simbolo_virgula => continue,
+							simbolo_abre_parenteses => {
+								/* MEPA 079 */
+								return;
+							},
+						}
+					}
+				},
+
+				simbolo_lambda => {
+					/* MEPA 079 */
+					return;
+				},
+
+				_ => {
+					println!("ERRO, ABRE PARENTESES OU LAMBDA ESPERADO.");
+					return;
+				},
+			}
+		},
+
+		simbolo_abre_parenteses => {
+			expr();
+			/* MEPA 154 */
+			simbolo = consome_token();
+			if simbolo != simbolo_abre_parenteses {
+				println!("ERRO, ABRE PARENTESES ESPERADO.");
+				return;
+			}
+			return;
+		},
+
+		simbolo_not => {
+			factor();
+			/* MEPA 155 */
+			return;
+		},
+
+		simbolo_abre_colchetes => {
+			simbolo = consome_token();
+			if simbolo == simbolo_fecha_colchetes {
+				/* MEPA 161 */
+				return;
+			}
+			loop {
+				expr();
+				/* MEPA 162 */
+				simbolo = consome_token();
+				if simbolo == simbolo_ponto_ponto {
+					expr();
+					/* MEPA 163 */
+				}
+				simbolo = consome_token();
+				match simbolo {
+					simbolo_virgula => continue,
+					simbolo_fecha_colchetes => return,
+					_ => {
+						println!("ERRO, VIRGULA OU FECHA COLCHETES ESPERADO.");
+						return;
+					},
+				}
+			}
+		},
+
+		_ => {
+			println!("ERRO, COIDEN OU NUMB SIMBOLO_NIL OU STRING OU VAIDEN OU FUIDEN OU ABRE PARENTESES OU ABRE COLCHETES OU NOT ESPERADO.");
+			return;
+		},
+	}
 }
 
 fn term() {
