@@ -50,6 +50,19 @@ const simbolo_label: u32 = 47;
 const simbolo_const: u32 = 48;
 const simbolo_type: u32 = 49;
 const simbolo_begin: u32 = 50;
+const simbolo_if: u32 = 51;
+const simbolo_while: u32 = 52;
+const simbolo_repeat: u32 = 53;
+const simbolo_for: u32 = 54;
+const simbolo_with: u32 = 55;
+const simbolo_goto: u32 = 56;
+const simbolo_dois_pontos_igual: u32 = 57;
+const simbolo_then: u32 = 58;
+simbolo_else
+simbolo_do 
+simbolo_until
+simbolo_to
+simbolo_down_to
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -955,7 +968,303 @@ fn block() {
 }
 
 fn statm() {
+	let mut simbolo = consome_token();
 
+	match simbolo {
+		NUMB => {
+			/* MEPA 075 */
+			simbolo = consome_token();
+			if simbolo != simbolo_dois_pontos {
+				println!("ERRO, DOIS PONTOS ESPERADO!");
+				return;
+			}
+			statm();
+			return;
+		},
+		VAIDEN => {
+			infipo();
+			simbolo = consome_token();
+			if simbolo != simbolo_dois_pontos_igual {
+				println!("ERRO, DOIS PONTOS IGUAL ESPERADO!");
+				return;
+			}
+			expr();
+			/* MEPA 080 */
+			return;
+		},
+		FUIDEN => {
+			simbolo = consome_token();
+			if simbolo != simbolo_dois_pontos_igual {
+				println!("ERRO, DOIS PONTOS IGUAL ESPERADO!");
+				return;
+			}
+			expr();
+			/* MEPA 080 */
+			return;
+		},
+		PRIDEN => {
+			/* MEPA 077 */
+			simbolo = consome_token();
+			match simbolo {
+				simbolo_abre_parenteses => {
+					loop {
+						simbolo = consome_token();
+						if simbolo == PRIDEN {
+							/* MEPA 078 */
+						}
+						else {
+							expr();
+							/* MEPA 078 */
+						}
+						simbolo = consome_token();
+						match simbolo {
+							simbolo_virgula => continue,
+							simbolo_fecha_parenteses => {
+								/* MEPA 079 */
+								return;
+							},
+							_ => {
+								println!("ERRO, FECHA PARENTESES OU VIRGULA ESPERADO!");
+								return;
+							} 
+						}
+					}
+				},
+				simbolo_lambda => {
+					/* MEPA 079 */
+						return;
+				},
+				_ => {
+					println!("ERRO, ABRE PARENTESES OU LAMBDA ESPERADO!");
+					return;
+				},
+			}
+		},
+		simbolo_begin => {
+			loop {
+				statm();
+				simbolo = consome_token();
+				match simbolo {
+					simbolo_ponto_virgula => continue,
+					simbolo_end => return,
+					_ => {
+						println!("ERRO, PONTO E VIRGULA OU END ESPERADO!");
+						return;
+					},
+				}
+			}
+		},
+		simbolo_if => {
+			expr();
+			simbolo = consome_token();
+			if simbolo != simbolo_then {
+				println!("ERRO, THEN ESPERADO!");
+				return;
+			}
+			/* MEPA 086 */
+			statm();
+			simbolo = consome_token();
+			if simbolo == simbolo_else {
+				/* MEPA 087 */
+				statm();
+				simbolo = consome_token();
+			}
+			/* MEPA 095 */
+			if simbolo != simbolo_lambda {
+				println!("ERRO, LAMBDA ESPERADO!");
+				return;
+			}
+			/* MEPA 088 */
+			return;
+		},
+		simbolo_case => {
+			/* MEPA 094 */
+			expr();
+			simbolo = consome_token();
+			if simbolo != simbolo_of {
+				println!("ERRO, 'OF' ESPERADO!");
+				return;
+			}
+			loop {
+				simbolo = consome_token();
+				match simbolo {
+					STRING => ,
+					simbolo_soma => {
+						simbolo = consome_token();
+						match simbolo {
+							COIDEN => {
+								/* MEPA 071 */
+							},
+							NUMB => {
+								/* MEPA 072 */
+							},
+							_ => {
+								println!("ERRO, COIDEN OU NUMB ESPERADO!");
+								return;
+							},
+						}
+					},
+					simbolo_subtracao => {
+						simbolo = consome_token();
+						match simbolo {
+							COIDEN => {
+								/* MEPA 071 */
+							},
+							NUMB => {
+								/* MEPA 072 */
+							},
+							_ => {
+								println!("ERRO, COIDEN OU NUMB ESPERADO!");
+								return;
+							},
+						}
+					},
+					COIDEN => ,
+					NUMB => ,
+					simbolo_ponto_virgula => {
+						/* MEPA 097 */
+						continue;
+					},
+					simbolo_end => {
+						/* MEPA 098 */
+						return;
+					},
+					_ => {
+						println!("ERRO, STRING OU SOMA OU SUBTRACAO OU COIDEN OU NUMB OU PONTO E VIRGULA OU END ESPERADO!");
+						return;
+					},
+				}
+				simbolo = consome_token();
+				match simbolo {
+					simbolo_virgula => {
+						/* MEPA 095 */
+						continue;
+					},
+					simbolo_dois_pontos => {
+						/* MEPA 096 */
+						statm();
+						simbolo = consome_token();
+					},
+					_ => {
+						println!("ERRO, VIRGULA ou DOIS PONTOS ESPERADO!");
+						return;
+					},
+				}
+				match simbolo {
+					simbolo_ponto_virgula => {
+						/* MEPA 097 */
+						continue;
+					},
+					simbolo_end => {
+						/* MEPA 098 */
+						return;
+					},
+					_ => {
+						println!("ERRO, PONTO E VIRGULA OU END ESPERADO!");
+						return;
+					},
+				}
+			}
+		},
+		simbolo_while => {
+			/* MEPA 081 */
+			expr();
+			simbolo = consome_token();
+			if simbolo != simbolo_do {
+				println!("ERRO, 'DO' ESPERADO!");
+				return;
+			}
+			/* MEPA 082 */
+			statm();
+			/* MEPA 083 */
+			return;
+		},
+		simbolo_repeat => {
+			/* MEPA 084 */
+			loop {
+				statm();
+				simbolo = consome_token();
+				match simbolo {
+					simbolo_ponto_virgula => continue,
+					simbolo_until => break,
+					_ => {
+						println!("ERRO, PONTO E VIRGULA OU UNTIL ESPERADO!");
+						return;
+					},
+				}
+			}
+			expr();
+			/* MEPA 085 */
+			return;
+		},
+		simbolo_for => {
+			simbolo = consome_token();
+			if simbolo != VAIDEN {
+				println!("ERRO, VAIDEN ESPERADO!");
+				return;
+			}
+			infipo();
+			simbolo = consome_token();
+			if simbolo != simbolo_dois_pontos_igual {
+				println!("ERRO, DOIS PONTOS IGUAL ESPERADO!");
+				return;
+			}
+			expr();
+			/* MEPA 089 */
+			simbolo = consome_token();
+			match simbolo {
+				simbolo_to => ,
+				simbolo_down_to => ,
+				_ => {
+					println!("ERRO, TO OU DOWN_TO ESPERADO!");
+					return;
+				},
+			}
+			expr();
+			simbolo = consome_token();
+			if simbolo != simbolo_do {
+				println!("ERRO, DO ESPERADO!");
+				return;
+			}
+			/* MEPA 090 */
+			statm();
+			/* MEPA 091 */
+			return;
+		},
+		simbolo_with => {
+			loop {
+				simbolo = consome_token();
+				if simbolo != VAIDEN {
+					println!("ERRO, VAIDEN ESPERADO!");
+					return;
+				}
+				infipo();
+				/* MEPA 092 */
+				simbolo = consome_token();
+				match simbolo {
+					simbolo_virgula => continue,
+					simbolo_do => break,
+					_ => {
+						println!("ERRO, VIRGULA OU DO ESPERADO!");
+						return;
+					},
+				}
+			}
+			statm();
+			/* MEPA 093 */
+			return;
+		},
+		simbolo_goto => {
+			simbolo = consome_token();
+			if simbolo != NUMB {
+				println!("ERRO, NUMB ESPERADO!");
+				return;
+			}
+			/* MEPA 076 */
+			return;
+		},
+		_ => return,
+	}
 }
 
 fn progrm() {
