@@ -40,6 +40,7 @@ const simbolo_end: u32 = 37;
 const simbolo_ponto_virgula: u32 = 38;
 const simbolo_dois_pontos: u32 = 39;
 const simbolo_case: u32 = 40;
+const simbolo_lambda: u32 = 41;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
