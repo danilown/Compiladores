@@ -43,6 +43,9 @@ const simbolo_case: u32 = 40;
 const simbolo_lambda: u32 = 41;
 const simbolo_nil: u32 = 42;
 const simbolo_not: u32 = 43;
+const simbolo_proc: u32 = 44;
+const simbolo_func: u32 = 45;
+const simbolo_var: u32 = 46;
 
 // Codigos para tokens terminais
 const NUMB: u32 = 9; 	// number
@@ -658,7 +661,73 @@ fn expr() {
 }
 
 fn palist() {
+	let mut simbolo = consome_token();
 
+	if simbolo == simbolo_abre_parenteses {
+		loop {
+			/* MEPA 008 */
+			simbolo = consome_token();
+			if simbolo == simbolo_proc {
+				loop {
+					simbolo = consome_token();
+					if simbolo != IDEN {
+						println!("ERRO, IDEN ESPERADO!");
+						return;
+					}
+					/* MEPA 045 */
+					if simbolo == simbolo_virgula {
+						continue;
+					}
+					else {
+						break;
+					}
+				}
+			}
+			else {
+				if simbolo == simbolo_func {
+					/* MEPA 006 */
+				}
+				else {
+					if simbolo == simbolo_var {
+						/* MEPA 007 */
+					}
+				}
+				loop {
+					simbolo = consome_token();
+					if simbolo != IDEN {
+						println!("ERRO, IDEN ESPERADO!");
+						return;
+					}
+					/* MEPA 005 */
+					simbolo = consome_token();
+					match simbolo {
+						simbolo_virgula => continue,
+						simbolo_dois_pontos => {
+							/* MEPA 002 */
+							simbolo = consome_token();
+							if simbolo != TYIDEN {
+								println!("ERRO, VIRGULA OU FECHA PARENTESES ESPERADO!");
+								return;
+							}
+							/* MEPA 009 */
+							break;
+						},
+					}
+				}
+			}
+			simbolo = consome_token();
+			match simbolo {
+				simbolo_virgula => {
+					/* MEPA 004 */
+					continue;
+				},
+				simbolo_fecha_parenteses => return,
+			}
+		}
+	}
+	else {
+		return;
+	}
 }
 
 fn block() {
