@@ -58,22 +58,22 @@ const simbolo_with: u32 = 55;
 const simbolo_goto: u32 = 56;
 const simbolo_dois_pontos_igual: u32 = 57;
 const simbolo_then: u32 = 58;
-simbolo_else
-simbolo_do 
-simbolo_until
-simbolo_to
-simbolo_down_to
+const simbolo_else: u32 = 59;
+const simbolo_do: u32 = 60;
+const simbolo_until: u32 = 61;
+const simbolo_to: u32 = 62;
+const simbolo_down_to: u32 = 63;
 
 // Codigos para tokens terminais
-const NUMB: u32 = 9; 	// number
-const STRING: u32 = 10;	// cadeia de caracteres
-const IDEN: u32 = 11;	// identifier
-const COIDEN: u32 = 12;	// constant identifier
-const FIIDEN: u32 = 13;	// filed identifier
-const VAIDEN: u32 = 14; // variable identifier
-const FUIDEN: u32 = 15;	// function identifier
-const TYIDEN: u32 = 16;	// type identifier
-const PRIDEN: u32 = 17;	// procedure identifier
+const NUMB: u32 = 64; 	// number
+const STRING: u32 = 65;	// cadeia de caracteres
+const IDEN: u32 = 66;	// identifier
+const COIDEN: u32 = 67;	// constant identifier
+const FIIDEN: u32 = 68;	// filed identifier
+const VAIDEN: u32 = 69; // variable identifier
+const FUIDEN: u32 = 70;	// function identifier
+const TYIDEN: u32 = 71;	// type identifier
+const PRIDEN: u32 = 72;	// procedure identifier
 
 fn asd(){
 
