@@ -289,6 +289,8 @@ fn filist() {
 				if simbolo = simbolo_dois_pontos {
 					/* MEPA 102 */
 					type();
+					/* MEPA 130 */
+					simbolo = consome_token();
 				}
 				else {
 					println!("ERRO, DOIS PONTOS OU VIRGULA ESPERADO.");
@@ -296,7 +298,6 @@ fn filist() {
 				}
 			}
 		}
-		simbolo = consome_token();
 		if simbolo == simbolo_ponto_virgula {
 			continue;
 		}
@@ -309,19 +310,15 @@ fn filist() {
 		/* MEPA 001 */
 		simbolo = consome_token();
 		if simbolo == IDEN {
+			/* MEPA 030 */
 			simbolo = consome_token();
 			if simbolo != simbolo_virgula {
 				println!("ERRO, VIRGULA ESPERADA.");
 				return;
 			}
-		}
-		simbolo = consome_token();
-		if simbolo != simbolo_lambda {
-			println!("ERRO, LAMBDA ESPERADA.");
-			return;
+			simbolo = consome_token();
 		}
 		/* MEPA 002 */
-		simbolo = consome_token();
 		if simbolo != TYIDEN {
 			println!("ERRO, TYIDEN ESPERADO.");
 			return;
@@ -363,19 +360,11 @@ fn filist() {
 
 				COIDEN => ,
 				NUMB => ,
+
+				simbolo_ponto_virgula => continue,
 				_ => {
-					simbolo = consome_token();
-					match simbolo {
-						simbolo_ponto_virgula => continue,
-						simbolo_lambda => {
-							/* MEPA 135 */
-							return;
-						},
-						_ => {
-							println!("ERRO, PONTO E VIRGULA OU LAMBDA ESPERADO.");
-							return;
-						},
-					}
+					/* MEPA 135 */
+					return;
 				},
 			}
 			simbolo = consome_token();
@@ -396,6 +385,7 @@ fn filist() {
 						println!("ERRO, FECHA PARENTESES ESPERADO.");
 						return;
 					}
+					simbolo = consome_token();
 				},
 				_ => {
 					println!("ERRO, VIRGULA OU DOIS PONTOS ESPERADO.");
@@ -403,15 +393,10 @@ fn filist() {
 				},
 			}
 
-			simbolo = consome_token();
 			match simbolo {
 				simbolo_ponto_virgula => continue,
-				simbolo_lambda => {
-					/* MEPA 135 */
-					return;
-				},
 				_ => {
-					println!("ERRO, PONTO E VIRGULA OU LAMBDA ESPERADO.");
+					/* MEPA 135 */
 					return;
 				},
 			}
@@ -419,14 +404,8 @@ fn filist() {
 		}
 	}
 	else {
-		if simbolo == simbolo_lambda {
-			/* MEPA 131 */
-			return;
-		}
-		else {
-			println!("ERRO, CASE OU LAMBDA ESPERADO.");
-			return;
-		}
+		/* MEPA 131 */
+		return;
 	}
 }
 
