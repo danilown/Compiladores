@@ -1,1 +1,1 @@
-/home/danilo/Documentos/Rust/Compiladores/target/debug/arquivos: /home/danilo/Documentos/Rust/Compiladores/src/main.rs
+/home/danilo/Documentos/Compiladores/target/debug/arquivos: /home/danilo/Documentos/Compiladores/src/main.rs
