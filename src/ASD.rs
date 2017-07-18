@@ -280,7 +280,7 @@ pub fn filist() {
 					/* MEPA 102 */
 					ttype();
 					/* MEPA 130 */
-					simbolo = consome_token();
+					simbolo = recebe_token();
 				},
 
 				_ => {
@@ -290,6 +290,7 @@ pub fn filist() {
 			}
 		}
 		if simbolo == simbolo_ponto_virgula {
+			consome_token();
 			continue;
 		}
 		else {
@@ -298,6 +299,7 @@ pub fn filist() {
 	}
 
 	if simbolo == simbolo_case {
+		consome_token();
 		/* MEPA 001 */
 		simbolo = consome_token();
 		if simbolo == IDEN {
@@ -323,11 +325,12 @@ pub fn filist() {
 		}
 
 		loop {
-			simbolo = consome_token();
+			simbolo = recebe_token();
 			match simbolo {
-				STRING => ,
+				STRING => consome_token(),
 
 				simbolo_soma => {
+					consome_token();
 					simbolo = consome_token();
 					match simbolo {
 						COIDEN => ,
@@ -340,6 +343,7 @@ pub fn filist() {
 				},
 
 				simbolo_subtracao => {
+					consome_token();
 					simbolo = consome_token();
 					match simbolo {
 						COIDEN => ,
@@ -351,9 +355,12 @@ pub fn filist() {
 					}
 				},
 
-				COIDEN => ,
-				NUMB => ,
-				simbolo_ponto_virgula => continue,
+				COIDEN => consome_token(),
+				NUMB => consome_token(),
+				simbolo_ponto_virgula => {
+					consome_token();
+					continue;
+				},
 				_ => {
 					println!("ERA LAMBDA, MAS NAO EH MAIS >> SEGUE O JOGO...");
 					/* MEPA 135 */
@@ -378,7 +385,7 @@ pub fn filist() {
 						println!("ERRO, FECHA PARENTESES ESPERADO.");
 						return;
 					}
-					simbolo = consome_token();
+					simbolo = recebe_token();
 				},
 				_ => {
 					println!("ERRO, VIRGULA OU DOIS PONTOS ESPERADO.");
@@ -387,7 +394,10 @@ pub fn filist() {
 			}
 
 			match simbolo {
-				simbolo_ponto_virgula => continue,
+				simbolo_ponto_virgula => {
+					consome_token();
+					continue;
+				},
 				_ => {
 					println!("ERA LAMBDA, MAS NAO EH MAIS >> SEGUE O JOGO...");
 					/* MEPA 135 */
@@ -955,21 +965,22 @@ pub fn block() {
 	}
 }
 
-fn statm() {
-	let mut simbolo = consome_token();
+pub fn statm() {
+	let mut simbolo = recebe_token();
 
-	match simbolo {
-		NUMB => {
-			/* MEPA 075 */
-			simbolo = consome_token();
-			if simbolo != simbolo_dois_pontos {
-				println!("ERRO, DOIS PONTOS ESPERADO!");
-				return;
-			}
-			statm();
+	if simbolo == NUMB {
+		consome_token();
+		/* MEPA 075 */
+		simbolo = consome_token();
+		if simbolo != simbolo_dois_pontos {
+			println!("ERRO, DOIS PONTOS ESPERADO!");
 			return;
-		},
+		}
+		simbolo = recebe_token();
+	}
+	match simbolo {
 		VAIDEN => {
+			consome_token();
 			infipo();
 			simbolo = consome_token();
 			if simbolo != simbolo_dois_pontos_igual {
@@ -981,6 +992,7 @@ fn statm() {
 			return;
 		},
 		FUIDEN => {
+			consome_token();
 			simbolo = consome_token();
 			if simbolo != simbolo_dois_pontos_igual {
 				println!("ERRO, DOIS PONTOS IGUAL ESPERADO!");
@@ -991,13 +1003,16 @@ fn statm() {
 			return;
 		},
 		PRIDEN => {
+			consome_token();
 			/* MEPA 077 */
-			simbolo = consome_token();
+			simbolo = recebe_token();
 			match simbolo {
 				simbolo_abre_parenteses => {
+					consome_token();
 					loop {
-						simbolo = consome_token();
+						simbolo = recebe_token();
 						if simbolo == PRIDEN {
+							consome_token();
 							/* MEPA 078 */
 						}
 						else {
@@ -1018,17 +1033,14 @@ fn statm() {
 						}
 					}
 				},
-				simbolo_lambda => {
-					/* MEPA 079 */
-						return;
-				},
 				_ => {
-					println!("ERRO, ABRE PARENTESES OU LAMBDA ESPERADO!");
+					/* MEPA 079 */
 					return;
 				},
 			}
 		},
 		simbolo_begin => {
+			consome_token();
 			loop {
 				statm();
 				simbolo = consome_token();
@@ -1043,6 +1055,7 @@ fn statm() {
 			}
 		},
 		simbolo_if => {
+			consome_token();
 			expr();
 			simbolo = consome_token();
 			if simbolo != simbolo_then {
@@ -1051,21 +1064,19 @@ fn statm() {
 			}
 			/* MEPA 086 */
 			statm();
-			simbolo = consome_token();
+			simbolo = recebe_token();
 			if simbolo == simbolo_else {
+				consome_token();
 				/* MEPA 087 */
 				statm();
-				simbolo = consome_token();
 			}
 			/* MEPA 095 */
-			if simbolo != simbolo_lambda {
-				println!("ERRO, LAMBDA ESPERADO!");
-				return;
-			}
+			println!("ERA LAMBDA, MAS NAO EH MAIS >> SEGUE O JOGO...");
 			/* MEPA 088 */
 			return;
 		},
 		simbolo_case => {
+			consome_token();
 			/* MEPA 094 */
 			expr();
 			simbolo = consome_token();
@@ -1132,29 +1143,30 @@ fn statm() {
 						/* MEPA 096 */
 						statm();
 						simbolo = consome_token();
+						match simbolo {
+							simbolo_ponto_virgula => {
+								/* MEPA 097 */
+								continue;
+							},
+							simbolo_end => {
+								/* MEPA 098 */
+								return;
+							},
+							_ => {
+								println!("ERRO, PONTO E VIRGULA OU END ESPERADO!");
+								return;
+							},
+						}
 					},
 					_ => {
 						println!("ERRO, VIRGULA ou DOIS PONTOS ESPERADO!");
 						return;
 					},
 				}
-				match simbolo {
-					simbolo_ponto_virgula => {
-						/* MEPA 097 */
-						continue;
-					},
-					simbolo_end => {
-						/* MEPA 098 */
-						return;
-					},
-					_ => {
-						println!("ERRO, PONTO E VIRGULA OU END ESPERADO!");
-						return;
-					},
-				}
 			}
 		},
 		simbolo_while => {
+			consome_token();
 			/* MEPA 081 */
 			expr();
 			simbolo = consome_token();
@@ -1168,6 +1180,7 @@ fn statm() {
 			return;
 		},
 		simbolo_repeat => {
+			consome_token();
 			/* MEPA 084 */
 			loop {
 				statm();
@@ -1186,6 +1199,7 @@ fn statm() {
 			return;
 		},
 		simbolo_for => {
+			consome_token();
 			simbolo = consome_token();
 			if simbolo != VAIDEN {
 				println!("ERRO, VAIDEN ESPERADO!");
@@ -1220,6 +1234,7 @@ fn statm() {
 			return;
 		},
 		simbolo_with => {
+			consome_token();
 			loop {
 				simbolo = consome_token();
 				if simbolo != VAIDEN {
@@ -1243,6 +1258,7 @@ fn statm() {
 			return;
 		},
 		simbolo_goto => {
+			consome_token();
 			simbolo = consome_token();
 			if simbolo != NUMB {
 				println!("ERRO, NUMB ESPERADO!");
