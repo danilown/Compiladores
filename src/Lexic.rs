@@ -8,7 +8,6 @@ use std::process::Command;
 use std::convert::From;
 use std::char::*;
 
-
 // Codigos para tokens nao terminais
 const constant:                 u32 = 0;
 const simple_type:              u32 = 1;
@@ -78,14 +77,16 @@ const simbolo_down_to:          u32 = 63;
 // ----------------------------------------
 // Adicionar no sintático:
 const simbolo_clrscr:           u32 = 73;
-const simbolo_abre_parenteses   u32 = 74;
-const simbolo_integer           u32 = 75;
-const simbolo_read              u32 = 76;
-const simbolo_write             u32 = 77;
-const simbolo_true              u32 = 78;
-const simbolo_false             u32 = 79;
-const simbolo_char              u32 = 80;
-const simbolo_boolean           u32 = 81;
+const simbolo_abre_parenteses:  u32 = 74;
+const simbolo_integer:          u32 = 75;
+const simbolo_read:             u32 = 76;
+const simbolo_write:            u32 = 77;
+const simbolo_true:             u32 = 78;
+const simbolo_false:            u32 = 79;
+const simbolo_char:             u32 = 80;
+const simbolo_boolean:          u32 = 81;
+const simbolo_identifier:       u32 = 82;
+const simbolo_div:              u32 = 83;
 
 const NUMB:     u32 = 64; // number
 const STRING:   u32 = 65; // cadeia de caracteres
@@ -96,51 +97,56 @@ const VAIDEN:   u32 = 69; // variable identifier
 const FUIDEN:   u32 = 70; // function identifier
 const TYIDEN:   u32 = 71; // type identifier
 const PRIDEN:   u32 = 72; // procedure identifier
-const FLOAT:    u32 = 82; // FLoat Numbers
+const FLOAT:    u32 = 84; // FLoat Numbers
 
 
-static mut escopo;
-static enum {reservada, simbolo, constante, identificador}
+static mut escopo: u32 =  0;
+static mut next:   u32 =  0;
+
 struct Token {
-    tok:    &'static str,
-    tipe:   i32,
+    tok:    String,
+    tipe:   u32,
     line:   i32,
     row:    i32,
-    escope: i32,
+    escope: u32,
     used:   bool,
 }
 
-fn SimbolTable -> Vec<&str> {
+fn SimbolTable<'a>() -> Vec<String> {
     
   let mut file = File::open("hello.pas").expect("Unable to open the file");
   let mut contents = String::new();
   file.read_to_string(&mut contents).expect("Unable to read the file");
 
-  let mut result = Vec::new();
+  let mut result = Vec::<String>::new();
   let mut last   = 0;
 
   // Armazena cada token encontado no vetor Result
-  for (index, matched) in contents.match_indices(|c: char| !(c.is_alphanumeric())){
-        if last != index {
-            result.push(&contents[last..index]);
+  for (idx, matched) in contents.match_indices(|c: char| !(c.is_alphanumeric())){
+        if last != idx {
+            result.push((&contents[last..idx]).to_string());
         }
 
         if(matched == "\r" || matched == "\n" || matched == " "){
         } else {
-            result.push(matched);
+            result.push(matched.to_string());
         }
-        last = index + matched.len();
+        last = idx + matched.len();
     }
 
     if last < contents.len() {
-        result.push(&contents[last..]);
+        result.push((&contents[last..]).to_string());
     }
     return(result);
 }
 
-fn Lexic(next: usize) {
+fn Organize(){
 
-    
+}
+
+fn Lexic(result: &mut Vec<String>, GoOn: bool) -> Token {
+
+
     let reservadas = vec!["div", "or", "and", "not", "if", "then", "else", "of",
         "while", "do", "begin", "end", "read", "write", "var", "array", "func",
         "proc", "program", "true", "false", "char", "integer", "boolean", "clrscr", 
@@ -153,434 +159,354 @@ fn Lexic(next: usize) {
     let numeros = vec!["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
     let mut classificada = 0;
-    let mut next_token = Token{tok: "", tipe: 0, line: 0, row: 0, escope: 0, used: false);
+    let mut next_token = Token{tok: ("").to_string(), tipe: 0, line: 0, row: 0, escope: 0, used: false};
 
     // Classificação do token
-    
+
+unsafe{    
+    println!("result in Lexic = {:?}", result[next as usize] );
     // Verifica se é palavra reservada e classifica 
     for i in 0..reservadas.len() {
 
-        if result[next].to_lowercase() == reservadas[i] {
+        if result[next as usize].to_lowercase() == reservadas[i] {
 
-            if result[next].to_lowercase() == "begin"{
+            if result[next as usize].to_lowercase() == "begin"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_begin, line: 0, row: 0, escope: escopo, used: false};
-                escopo++;       // Se for begin, aumenta o escopo para os próximos tokens
-                return next_token;
-            }
-            if result[next].to_lowercase() == "end"{
+                next_token = Token{tok: (&result[next as usize]).to_string(), tipe: simbolo_begin, line: 0, row: 0, escope: escopo, used: false};
+                escopo += 1;       // Se for begin, aumenta o escopo para os próximos tokens
+            }else if result[next as usize ].to_lowercase() == "end"{
                 classificada = 1;
-                escopo--;       // se for end, retorna o escopo
-                let mut next_token = Token{tok: result[next], tipo: simbolo_end, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
+                escopo -= 1;       // se for end, retorna o escopo
+                next_token = Token{tok: (&result[next as usize]).to_string(), tipe: simbolo_end, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize ].to_lowercase() == "or"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_or, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "in"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_in, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "and"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_and, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "div"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_div, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "array"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_array, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "packed"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_packed, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "dif"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_dif, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "of"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_of, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "file"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_file, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "set"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_set, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "case"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_case, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "nil"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_nil, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "not"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_not, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "proc"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_proc, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "func"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_func, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "var"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_var, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "label"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_label, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "const"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_const, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "type"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_type, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "if"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_if, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "while"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_while, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "repeat"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_repeat, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "for"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_for, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "with"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_with, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "goto"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_goto, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "then"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_then, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "else"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_else, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "do"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_do, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "until"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_until, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "to"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_to, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "downto"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_down_to, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "clrscr"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_clrscr, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "integer"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_integer, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "read"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_read, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "write"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_write, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "program"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: program, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "true"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_true, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "false"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_false, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "char"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_char, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "boolean"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_boolean, line: 0, row: 0, escope: escopo, used: false};
             }
 
-            if result[next].to_lowercase() == "or"{
-                classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_or, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-
-            if result[next].to_lowercase() == "in"{
-                classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_in, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "and"{
-                classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_and, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "div"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_div, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "array"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_array, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "packed"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_packed, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "dif"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_dif, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "of"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_of, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "file"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_file, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "set"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_set, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "case"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_case, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "nil"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_nil, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "not"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_not, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "proc"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_proc, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "func"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_func, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "var"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_var, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "label"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_label, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "const"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_const, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "type"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_type, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "if"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_if, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "while"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_while, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "repeat"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_repeat, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "for"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_for, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "with"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_with, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "goto"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_goto, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "then"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_then, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "else"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_else, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "do"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_do, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "until"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_until, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "to"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_to, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "downto"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_down_to, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "clrscr"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_clrscr, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "integer"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_integer, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "read"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_read, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "write"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_write, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }if result[next].to_lowercase() == "program"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: program, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "true"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_true, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "false"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_false, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "char"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_char, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
-            if result[next].to_lowercase() == "boolean"{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: simbolo_boolean, line: 0, row: 0, escope: escopo, used: false};
-                    return next_token;
-            }
+        if(GoOn){
+            next += 1;
+        }
+        return next_token;
         }
     }
-    
+
     // verifica se é simbolo e classifica
     for i in 0..simbolos.len() {
-        if result[next].to_lowercase() == simbolos[i] {
+        if result[next as usize].to_lowercase() == simbolos[i] {
 
-            if result[next].to_lowercase() == ","{
+            if result[next as usize].to_lowercase() == ","{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_virgula, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == ")"{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_virgula, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == ")"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_fecha_parenteses, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "+"{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_fecha_parenteses, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "+"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_soma, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "-"{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_soma, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "-"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_subtracao, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if (result[next].to_lowercase() == "."){
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_subtracao, line: 0, row: 0, escope: escopo, used: false};
+            }if (result[next as usize].to_lowercase() == "."){
                     
-                if(result[next+1].to_lowercase() == "."){
+                if(result[(next+1) as usize].to_lowercase() == "."){
 
                     let mut tk = String::new();                 // variavel para concatenar os tokents
-                    tk = result[next].to_string();              // pega o token atual "."
-                    tk.push_str(&result[next+1].to_string());   // concatena o próximo token ""
+                    tk = result[next as usize].to_string();              // pega o token atual "."
+                    tk.push_str(&result[(next+1) as usize].to_string());   // concatena o próximo token ""
 
                     classificada = 1;
-                    let mut next_token = Token{tok: &tk, tipo: simbolo_ponto_ponto, line: 0, row: 0, escope: escopo, used: false};
-                    return(next_token);
+                     next_token = Token{tok: (&tk).to_string(), tipe: simbolo_ponto_ponto, line: 0, row: 0, escope: escopo, used: false};
 
+                }else {
+                    classificada = 1;
+                     next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_ponto, line: 0, row: 0, escope: escopo, used: false};
                 }
-
+            }else if result[next as usize].to_lowercase() == "="{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_ponto, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            } 
-            if result[next].to_lowercase() == "="{
-                classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_igual, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if (result[next].to_lowercase() == "<"){
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_igual, line: 0, row: 0, escope: escopo, used: false};
+            }else if (result[next as usize].to_lowercase() == "<"){
 
-                if(result[next+1].to_lowercase() == "="){
+                if(result[(next+1) as usize].to_lowercase() == "="){
 
                     let mut tk = String::new();                 // variavel para concatenar os tokents
-                    tk = result[next].to_string();              // pega o token atual "<"
-                    tk.push_str(&result[next+1].to_string());   // concatena o próximo token "="
+                    tk = result[next as usize].to_string();              // pega o token atual "<"
+                    tk.push_str(&result[(next+1) as usize].to_string());   // concatena o próximo token "="
 
                     classificada = 1;
-                    let mut next_token = Token{tok: &tk, tipo: simbolo_menor_igual, line: 0, row: 0, escope: escopo, used: false};
-                    return(next_token);
-                }
-                    
-                if(result[next+1].to_lowercase() == ">"){
+                     next_token = Token{tok: (&tk).to_string(), tipe: simbolo_menor_igual, line: 0, row: 0, escope: escopo, used: false};
+
+                }else if(result[(next+1) as usize].to_lowercase() == ">"){
 
                     let mut tk = String::new();                 // variavel para concatenar os tokents
-                    tk = result[next].to_string();              // pega o token atual "<"
-                    tk.push_str(&result[next+1].to_string());   // concatena o próximo token ">"
+                    tk = result[next as usize].to_string();              // pega o token atual "<"
+                    tk.push_str(&result[(next+1) as usize].to_string());   // concatena o próximo token ">"
 
                     classificada = 1;
-                    let mut next_token = Token{tok: &tk, tipo: simbolo_diferent, line: 0, row: 0, escope: escopo, used: false};
-                    return(next_token);
-                }
+                     next_token = Token{tok: (&tk).to_string(), tipe: simbolo_diferent, line: 0, row: 0, escope: escopo, used: false};
 
-                classificada = 1;
-                let mut next_token = Token{tok: &tk, tipo: simbolo_menor, line: 0, row: 0, escope: escopo, used: false};
-                return(next_token);
-                    
-            }
-            if (result[next].to_lowercase() == ">"){
-                if(result[next+1].to_lowercase() == "="){
+                }else {
+                    classificada = 1;
+                     next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_menor, line: 0, row: 0, escope: escopo, used: false};
+                }      
+            }else if (result[next as usize].to_lowercase() == ">"){
+                if(result[(next+1) as usize].to_lowercase() == "="){
 
                     let mut tk = String::new();                 // variavel para concatenar os tokents
-                    tk = result[next].to_string();              // pega o token atual ">"
-                    tk.push_str(&result[next+1].to_string());   // concatena o próximo token "="
+                    tk = result[next as usize].to_string();              // pega o token atual ">"
+                    tk.push_str(&result[(next+1) as usize].to_string());   // concatena o próximo token "="
 
-                    let mut next_token = Token{tok: &tk, tipo: simbolo_maior_igual, line: 0, row: 0, escope: escopo, used: false};
-                    return(next_token);
+                     next_token = Token{tok: (&tk).to_string(), tipe: simbolo_maior_igual, line: 0, row: 0, escope: escopo, used: false};
+                
+                }else {
+                    classificada = 1;
+                     next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_maior, line: 0, row: 0, escope: escopo, used: false};
                 }
+            }else if result[next as usize].to_lowercase() == "["{
                 classificada = 1;
-                let mut next_token = Token{tok: &tk, tipo: simbolo_maior, line: 0, row: 0, escope: escopo, used: false};
-                return(next_token);
-            }
-            if result[next].to_lowercase() == "["{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_abre_colchetes, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "@"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_abre_colchetes, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "@"{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_arroba, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "\""{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_arroba, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "\""{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_aspas, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "]"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_aspas, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "]"{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_fecha_colchetes, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "*"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_fecha_colchetes, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "*"{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_asterisco, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "/"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_asterisco, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "/"{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_barra, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "%"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_barra, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == "%"{
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_mod, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == ";"{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_mod, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if result[next].to_lowercase() == ";"{
-                classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_ponto_virgula, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
-            if (result[next].to_lowercase() == ":"){
-                if(result[next+1].to_lowercase() == "="){
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_ponto_virgula, line: 0, row: 0, escope: escopo, used: false};
+            }else if (result[next as usize].to_lowercase() == ":"){
+                
+                if(result[(next+1) as usize].to_lowercase() == "="){
                     
                     let mut tk = String::new();                 // variavel para concatenar os tokents
-                    tk = result[next].to_string();              // pega o token atual ":"
-                    tk.push_str(&result[next+1].to_string());   // concatena o próximo token "="
+                    tk = result[next as usize].to_string();              // pega o token atual ":"
+                    tk.push_str(&result[(next+1) as usize].to_string());   // concatena o próximo token "="
 
                     classificada = 1;
-                    let mut next_token = Token{tok: &tk, tipo: simbolo_dois_pontos_igual, line: 0, row: 0, escope: escopo, used: false};
-                    return(next_token);
+                     next_token = Token{tok: (&tk).to_string(), tipe: simbolo_dois_pontos_igual, line: 0, row: 0, escope: escopo, used: false};
+
+                }else {
+                    classificada = 1;
+                     next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_dois_pontos, line: 0, row: 0, escope: escopo, used: false};
                 }
+
+            }else if result[next as usize].to_lowercase() == "("{
                 classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_dois_pontos, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_abre_parenteses, line: 0, row: 0, escope: escopo, used: false};
             }
-            if result[next].to_lowercase() == "("{
-                classificada = 1;
-                let mut next_token = Token{tok: result[next], tipo: simbolo_abre_parenteses, line: 0, row: 0, escope: escopo, used: false};
-                return next_token;
-            }
+
+        if (GoOn) {
+            next += 1;
+        }
+        return next_token;
         }
     }
 
     // verifica se é numero e classifica
-    for i in 0..numeros.len() {
-        if result[next].to_lowercase().parse::<u64>().is_ok() { // checa se a string é numérica
-            if(result[next+1].to_lowercase() == "."){           // checa se depois dela vem um ponto
+    if result[next as usize].to_lowercase().parse::<u64>().is_ok() { // checa se a string é numérica
+        
+        if(result[(next+1) as usize].to_lowercase() == "."){           // checa se depois dela vem um ponto
                                                                 // Se é ponto, concatena as strings em tk
-                let mut tk = String::new();                     // variavel para concatenar os tokens (tk)
-                tk = result[next].to_string();                  // pega o token atual
-                tk.push_str(&result[next+1].to_string());       // concatena com o próximo token
+            let mut tk = String::new();                     // variavel para concatenar os tokens (tk)
+            tk = result[next as usize].to_string();                  // pega o token atual
+            tk.push_str(&result[(next+1) as usize].to_string());       // concatena com o próximo token
 
-                // checa se depois do ponto vem outra string numerica
-                if(result[next+2].to_lowercase().parse::<u64>().is_ok ()){     
+            // checa se depois do ponto vem outra string numerica
+            if(result[(next+2) as usize].to_lowercase().parse::<u64>().is_ok ()){     
                                                                 
-                    tk.push_str(&result[next+2].to_string());   // concatena com o próximo token
+                tk.push_str(&result[(next+2) as usize].to_string());   // concatena com o próximo token
 
-                    // Classifica como float
-                    classificada = 1;
-                    let mut next_token = Token{tok: &tk, tipo: FLOAT, line: 0, row: 0, escope: escopo, used: false};
-                    return(next_token);
+                // Classifica como float
+                classificada = 1;
+                 next_token = Token{tok: (&tk).to_string(), tipe: FLOAT, line: 0, row: 0, escope: escopo, used: false};                
                 
                 // Se não for (numero-ponto-numero), classifica sepadado (numero),(ponto), ( __ )
-                }else{
-                    classificada = 1;
-                    let mut next_token = Token{tok: result[next], tipo: NUMB, line: 0, row: 0, escope: escopo, used: false};
-                    return(next_token);
-                }
+            }else{
+                classificada = 1;
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: NUMB, line: 0, row: 0, escope: escopo, used: false};
             }
+        }else {
             classificada = 1;
-            let mut next_token = Token{tok: result[next], tipo: NUMB , line: 0, row: 0, tok: result[next]};
-            return next_token;
+             next_token = Token{tok: (result[next as usize]).to_string(), tipe: NUMB, line: 0, row: 0, escope: escopo, used: false};
         }
+
+        if (GoOn) {
+            next += 1;
+        }
+        return next_token;
     }
+    
 
     // se não for nenhum dos anteriores, classifica como identificador
     if (classificada == 0 ){
-        let mut next_token = Token{tipo: IDEN, line: 0, row: 0, tok: result[next]};
-        return next_token;
+         next_token =  Token{tok: (result[next as usize]).to_string(), tipe: IDEN, line: 0, row: 0, escope: escopo, used: false};
     }
-
+    
+    if(GoOn) {
+        next += 1;
+    }
     return next_token;
+}
 }
 
 
 
 fn main() {
-    escopo = 0;
-    let mut atual = Token{tipo: 0, line: 0, row: 0, tok: ""};
-    let mut x = 0;
+    
+   // let mut atual = Token{tok: ("").to_string(), tipe: 0 , line: 0, row: 0, escope: 0, used: false};
+    let mut result = SimbolTable();
 
-    let result = SimbolTable();
-    atual = lexic(x);
+    println!("___PRIMEIRO_TOKEN__GOON_=_TRUE_");
+    let mut atual = Lexic(&mut result,true);
+    println!("Token = {}",atual.tok);
+    println!("Tipo =  {}",atual.tipe);
+    println!("uses =  {}",atual.used);
+
+    println!("___SEGUNDO_TOKEN__GOON_=_FALSE__");
+    atual = Lexic(&mut result,false);
+    println!("Token = {}",atual.tok);
+    println!("Tipo =  {}",atual.tipe);
+    println!("uses =  {}",atual.used);
+
+    println!("___TERCEIRO_TOKEN__GOON_=_TRUE__");
+    atual = Lexic(&mut result,true);
+    println!("Token = {}",atual.tok);
+    println!("Tipo =  {}",atual.tipe);
+    println!("uses =  {}",atual.used);
+
+    println!("___QUARTO_TOKEN__GOON_=_FALSE__");
+    atual = Lexic(&mut result,false);
+    println!("Token = {}",atual.tok);
+    println!("Tipo =  {}",atual.tipe);
+    println!("uses =  {}",atual.used);
     let _ = Command::new("cmd.exe").arg("/c").arg("pause").status();
 }
 
