@@ -2,7 +2,7 @@
 extern crate lazy_static;
 use std::process::Command;
 
-// pub mod Lexico;
+pub mod Lexico;
 mod Sintatico;
 // mod Semantico;
 

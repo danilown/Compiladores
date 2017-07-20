@@ -1,1 +1,1 @@
-/home/rodrigo/Stuff/Rust/pqp/Compiladores/target/debug/compiladores: /home/rodrigo/Stuff/Rust/pqp/Compiladores/src/main.rs
+/home/danilo/Documentos/Compiladores/target/debug/compiladores: /home/danilo/Documentos/Compiladores/src/main.rs /home/danilo/Documentos/Compiladores/src/Lexico.rs /home/danilo/Documentos/Compiladores/src/Sintatico.rs

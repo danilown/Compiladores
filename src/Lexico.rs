@@ -109,18 +109,18 @@ lazy_static! {
 }
 
 #[derive(Debug)]
-struct Token {
-    tok:    String,
-    tipe:   u32,
-    line:   i32,
-    row:    i32,
-    escope: u32,
-    used:   bool,
+pub struct Token {
+    pub tok:    String,
+    pub tipe:   u32,
+    pub line:   i32,
+    pub row:    i32,
+    pub escope: u32,
+    pub used:   bool,
 }
 
 fn SimbolTable<'a>() -> Vec<String> {
     
-  let mut file = File::open("src/hello.pas").expect("Unable to open the file");
+  let mut file = File::open("src/teste.pas").expect("Unable to open the file");
   let mut contents = String::new();
   file.read_to_string(&mut contents).expect("Unable to read the file");
 
@@ -454,7 +454,7 @@ unsafe{
                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_clrscr, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "integer"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_integer, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "read"{
                 classificada = 1;
                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_read, line: 0, row: 0, escope: escopo, used: false};

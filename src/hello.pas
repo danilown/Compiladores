@@ -1,7 +1,5 @@
-program Hello;
-begin
-{comment 1}
-// comment 2
-(*comment 3*)
-  writeln ('Hello, world.')
+program two;  
+const P : Char = 'This';  
+begin  
+  P = 5; 
 end.
