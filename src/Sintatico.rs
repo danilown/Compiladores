@@ -124,6 +124,7 @@ fn consome_token() -> u32 {
 
 		println!("{:?}", (*temp).tok);
 		println!("{:?}", (*temp).tipe);
+		println!("{:?}", (*temp).line);
 
 		(*temp).tipe
 	}	

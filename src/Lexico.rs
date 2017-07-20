@@ -116,7 +116,7 @@ pub struct Token {
 
 fn SimbolTable<'a>() -> Vec<String> {
     
-  let mut file = File::open("src/teste.pas").expect("Unable to open the file");
+  let mut file = File::open("teste.pas").expect("Unable to open the file");
   let mut contents = String::new();
   file.read_to_string(&mut contents).expect("Unable to read the file");
 
@@ -173,26 +173,22 @@ fn Organize(result: &mut Vec<String>) -> Vec<String>{
         }
 
         // se comentario2 estva aberto e achou \n -> fecha comentário
-        unsafe{
-            if comentario2 == true{
-                if result[i as usize] == "\n"{
-                    comentario2 = false;
-                    lines += 1;
-                    i += 1;
-                    continue
-                }else {
-                    i += 1;
-                    continue
-                }
-            }
-
+        if comentario2 == true{
             if result[i as usize] == "\n"{
-                lines += 1;
+                comentario2 = false;
+                i += 1;
+                continue
+            }else {
                 i += 1;
                 continue
             }
         }
 
+        if result[i as usize] == "\n"{
+            i += 1;
+            continue
+        }
+    
         // se comentario3 está aberto e encontrou *) -> fecha comentario
         if comentario3 == true{
             if result[i as usize] == "*"{

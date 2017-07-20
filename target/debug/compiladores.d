@@ -1,1 +1,1 @@
-/home/danilo/Documentos/Compiladores/target/debug/compiladores: /home/danilo/Documentos/Compiladores/src/main.rs /home/danilo/Documentos/Compiladores/src/Lexico.rs /home/danilo/Documentos/Compiladores/src/Sintatico.rs
+/home/vinicius/Documentos/Compiladores/target/debug/compiladores: /home/vinicius/Documentos/Compiladores/src/Lexico.rs /home/vinicius/Documentos/Compiladores/src/main.rs /home/vinicius/Documentos/Compiladores/src/Sintatico.rs
