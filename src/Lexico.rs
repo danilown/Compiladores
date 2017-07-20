@@ -97,7 +97,7 @@ const FLOAT:    u32 = 84; // FLoat Numbers
 
 
 static mut escopo: u32 =  0;
-static mut lines:  u32 =  0;
+static mut lines:  i32 =  0;
 static mut next:   u32 =  0;
 
 lazy_static! {
@@ -173,23 +173,25 @@ fn Organize(result: &mut Vec<String>) -> Vec<String>{
         }
 
         // se comentario2 estva aberto e achou \n -> fecha comentário
-        if comentario2 == true{
+        unsafe{
+            if comentario2 == true{
+                if result[i as usize] == "\n"{
+                    comentario2 = false;
+                    lines += 1;
+                    i += 1;
+                    continue
+                }else {
+                    i += 1;
+                    continue
+                }
+            }
+
             if result[i as usize] == "\n"{
-                comentario2 = false;
-                i += 1;
-                continue
-            }else {
+                lines += 1;
                 i += 1;
                 continue
             }
         }
-
-        if result[i as usize] == "\n"{
-
-            i += 1;
-            continue
-        }
-
 
         // se comentario3 está aberto e encontrou *) -> fecha comentario
         if comentario3 == true{
@@ -334,11 +336,11 @@ fn Lexic(result: &mut Vec<String>, GoOn: bool) -> Token {
     let numeros = vec!["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
     let mut classificada = 0;
-    let mut next_token = Token{tok: ("").to_string(), tipe: 0, line: 0, row: 0, escope: 0, used: false};
-
+    
+unsafe{    
+    let mut next_token = Token{tok: ("").to_string(), tipe: 0, line: lines, row: 0, escope: 0, used: false};
     // Classificação do token
 
-unsafe{    
     println!("result in Lexic = {:?}", result[next as usize] );
     // Verifica se é palavra reservada e classifica 
     for i in 0..reservadas.len() {
@@ -347,135 +349,135 @@ unsafe{
 
             if result[next as usize].to_lowercase() == "begin"{
                 classificada = 1;
-                next_token = Token{tok: (&result[next as usize]).to_string(), tipe: simbolo_begin, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (&result[next as usize]).to_string(), tipe: simbolo_begin, line: lines, row: 0, escope: escopo, used: false};
                 escopo += 1;       // Se for begin, aumenta o escopo para os próximos tokens
             }else if result[next as usize ].to_lowercase() == "end"{
                 classificada = 1;
                 escopo -= 1;       // se for end, retorna o escopo
-                next_token = Token{tok: (&result[next as usize]).to_string(), tipe: simbolo_end, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (&result[next as usize]).to_string(), tipe: simbolo_end, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize ].to_lowercase() == "or"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_or, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_or, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "in"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_in, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_in, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "and"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_and, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_and, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "div"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_div, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_div, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "array"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_array, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_array, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "packed"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_packed, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_packed, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "dif"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_dif, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_dif, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "of"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_of, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_of, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "file"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_file, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_file, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "set"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_set, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_set, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "case"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_case, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_case, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "nil"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_nil, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_nil, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "not"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_not, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_not, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "proc"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_proc, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_proc, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "func"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_func, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_func, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "var"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_var, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_var, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "label"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_label, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_label, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "const"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_const, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_const, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "type"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_type, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_type, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "if"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_if, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_if, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "while"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_while, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_while, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "repeat"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_repeat, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_repeat, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "for"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_for, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_for, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "with"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_with, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_with, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "goto"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_goto, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_goto, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "then"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_then, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_then, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "else"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_else, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_else, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "do"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_do, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_do, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "until"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_until, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_until, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "to"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_to, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_to, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "downto"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_down_to, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_down_to, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "clrscr"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "integer"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "read"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: PRIDEN, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "write"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: PRIDEN, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "program"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: program, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: program, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "true"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: , line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_true, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "false"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: , line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_false, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "char"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "boolean"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "writeln"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: PRIDEN, line: lines, row: 0, escope: escopo, used: false};
             }
 
         if(GoOn){
@@ -491,73 +493,73 @@ unsafe{
             
             if result[next as usize].to_lowercase() == ","{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_virgula, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_virgula, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == ")"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_fecha_parenteses, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_fecha_parenteses, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "+"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_soma, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_soma, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "-"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_subtracao, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_subtracao, line: lines, row: 0, escope: escopo, used: false};
             }else if (result[next as usize].to_lowercase() == "."){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_ponto, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_ponto, line: lines, row: 0, escope: escopo, used: false};
             }else if(result[next as usize].to_lowercase() == ".."){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_ponto_ponto, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_ponto_ponto, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "="{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_igual, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_igual, line: lines, row: 0, escope: escopo, used: false};
             }else if (result[next as usize].to_lowercase() == "<"){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_menor, line: 0, row: 0, escope: escopo, used: false};      
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_menor, line: lines, row: 0, escope: escopo, used: false};      
             }else if(result[next as usize].to_lowercase() == "<="){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_menor_igual, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_menor_igual, line: lines, row: 0, escope: escopo, used: false};
             }else if(result[next as usize].to_lowercase() == "<>"){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_diferent, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_diferent, line: lines, row: 0, escope: escopo, used: false};
             }else if (result[next as usize].to_lowercase() == ">"){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_maior, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_maior, line: lines, row: 0, escope: escopo, used: false};
             }else if(result[next as usize].to_lowercase() == ">="){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_maior_igual, line: 0, row: 0, escope: escopo, used: false};    
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_maior_igual, line: lines, row: 0, escope: escopo, used: false};    
             }else if result[next as usize].to_lowercase() == "["{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_abre_colchetes, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_abre_colchetes, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "@"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_arroba, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_arroba, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "\""{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_aspas, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_aspas, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "]"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_fecha_colchetes, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_fecha_colchetes, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "*"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_asterisco, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_asterisco, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "/"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_barra, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_barra, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "%"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_mod, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_mod, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == ";"{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_ponto_virgula, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_ponto_virgula, line: lines, row: 0, escope: escopo, used: false};
             }else if (result[next as usize].to_lowercase() == ":"){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_dois_pontos, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_dois_pontos, line: lines, row: 0, escope: escopo, used: false};
             }else if(result[next as usize].to_lowercase() == ":="){
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_dois_pontos_igual, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_dois_pontos_igual, line: lines, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "("{
                 classificada = 1;
-                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_abre_parenteses, line: 0, row: 0, escope: escopo, used: false};
+                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_abre_parenteses, line: lines, row: 0, escope: escopo, used: false};
             }
 
         if (GoOn) {
@@ -570,7 +572,7 @@ unsafe{
     if result[next as usize].to_lowercase().parse::<i64>().is_ok() { // checa se a string é numérica
         
         classificada = 1;
-        next_token = Token{tok: (result[next as usize]).to_string(), tipe: NUMB, line: 0, row: 0, escope: escopo, used: false};
+        next_token = Token{tok: (result[next as usize]).to_string(), tipe: NUMB, line: lines, row: 0, escope: escopo, used: false};
 
         if (GoOn) {
             next += 1;
@@ -582,7 +584,7 @@ unsafe{
     if result[next as usize].to_lowercase().parse::<f64>().is_ok() { // checa se a string é numérica
         
         classificada = 1;
-        next_token = Token{tok: (result[next as usize]).to_string(), tipe: FLOAT, line: 0, row: 0, escope: escopo, used: false};
+        next_token = Token{tok: (result[next as usize]).to_string(), tipe: FLOAT, line: lines, row: 0, escope: escopo, used: false};
 
         if (GoOn) {
             next += 1;
@@ -593,7 +595,7 @@ unsafe{
 
     // se não for nenhum dos anteriores, classifica como identificador
     if (classificada == 0){
-        next_token =  Token{tok: (result[next as usize]).to_string(), tipe: IDEN, line: 0, row: 0, escope: escopo, used: false};
+        next_token =  Token{tok: (result[next as usize]).to_string(), tipe: IDEN, line: lines, row: 0, escope: escopo, used: false};
     }
     
     if(GoOn) {
