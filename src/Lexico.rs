@@ -116,7 +116,7 @@ pub struct Token {
 
 fn SimbolTable<'a>() -> Vec<String> {
     
-  let mut file = File::open("teste.pas").expect("Unable to open the file");
+  let mut file = File::open("d:/compiladores/src/teste2.pas").expect("Unable to open the file");
   let mut contents = String::new();
   file.read_to_string(&mut contents).expect("Unable to read the file");
 
@@ -148,6 +148,7 @@ fn Organize(result: &mut Vec<String>) -> Vec<String>{
     let mut comentario1 = false;
     let mut comentario2 = false;
     let mut comentario3 = false;
+    let mut emstring    = false;
     let mut auxiliar = Vec::<String>::new();
     let mut i = 0;
 
@@ -189,6 +190,8 @@ fn Organize(result: &mut Vec<String>) -> Vec<String>{
             continue
         }
     
+
+
         // se comentario3 está aberto e encontrou *) -> fecha comentario
         if comentario3 == true{
             if result[i as usize] == "*"{
@@ -205,6 +208,23 @@ fn Organize(result: &mut Vec<String>) -> Vec<String>{
                 continue
             }
         }
+
+        if emstring == true{
+        
+            if result[i as usize] == "\'"{
+                emstring = false;
+            }
+            
+            i += 1;
+            continue
+        
+        }else if result[i as usize] == "\'"{
+            emstring = true;
+            auxiliar.push(("tipostring").to_string());
+            i += 1;
+            continue
+        }
+
  
         if result[i as usize].to_lowercase() == "{" {
             comentario1 = true;
@@ -324,7 +344,7 @@ fn Lexic(result: &mut Vec<String>, GoOn: bool) -> Token {
         "while", "do", "begin", "end", "read", "write", "var", "array", "func",
         "proc", "program", "true", "false", "char", "integer", "boolean", "clrscr", 
         "packed", "in", "dif", "file", "set", "case", "nil", "label", "const",
-        "type", "repeat", "for", "with", "goto", "until", "to", "downto", "writeln"];
+        "type", "repeat", "for", "with", "goto", "until", "to", "downto", "writeln", "tipostring", "readln"];
 
     let simbolos = vec!["+", "-", "*", "=", "<", ">", "(", ")", // <> >= <= .. :=
          "[", "]", ".", ",", ";", ":", "@", "\"", "/", "%", "..", "<>", ">=", "<=", ":="];    
@@ -474,7 +494,14 @@ unsafe{
             }else if result[next as usize].to_lowercase() == "writeln"{
                 classificada = 1;
                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: PRIDEN, line: lines, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "tipostring"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: STRING, line: lines, row: 0, escope: escopo, used: false};    
+            }else if result[next as usize].to_lowercase() == "readln"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: PRIDEN, line: lines, row: 0, escope: escopo, used: false};    
             }
+
 
         if(GoOn){
             next += 1;

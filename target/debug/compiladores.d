@@ -1,1 +1,1 @@
-/home/vinicius/Documentos/Compiladores/target/debug/compiladores: /home/vinicius/Documentos/Compiladores/src/Lexico.rs /home/vinicius/Documentos/Compiladores/src/main.rs /home/vinicius/Documentos/Compiladores/src/Sintatico.rs
+D:\Compiladores\target\debug\compiladores.exe: D:\Compiladores\src\Lexico.rs D:\Compiladores\src\Sintatico.rs D:\Compiladores\src\main.rs

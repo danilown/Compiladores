@@ -124,7 +124,6 @@ fn consome_token() -> u32 {
 
 		println!("{:?}", (*temp).tok);
 		println!("{:?}", (*temp).tipe);
-		println!("{:?}", (*temp).line);
 
 		(*temp).tipe
 	}	
@@ -546,6 +545,12 @@ pub fn factor() {
 			/* MEPA 167 */
 			return;
 		},
+		IDEN => {
+			/* MEPA 170 */
+			infipo();
+			/* MEPA 167 */
+			return;
+		},
 
 		FUIDEN => {
 			/* MEPA 077 */
@@ -584,7 +589,7 @@ pub fn factor() {
 			/* MEPA 154 */
 			simbolo = consome_token();
 			if simbolo != simbolo_fecha_parenteses {
-				println!("factor: ERRO, ABRE PARENTESES ESPERADO.");
+				println!("factor: ERRO, FECHA PARENTESES ESPERADO.");
 				return;
 			}
 			return;
@@ -1054,6 +1059,18 @@ pub fn statm() {
 			/* MEPA 080 */
 			return;
 		},
+		IDEN => {
+			consome_token();
+			infipo();
+			simbolo = consome_token();
+			if simbolo != simbolo_dois_pontos_igual {
+				println!("statm: ERRO, DOIS PONTOS IGUAL ESPERADO!");
+				return;
+			}
+			expr();
+			/* MEPA 080 */
+			return;
+		},
 		FUIDEN => {
 			consome_token();
 			simbolo = consome_token();
@@ -1264,8 +1281,8 @@ pub fn statm() {
 		simbolo_for => {
 			consome_token();
 			simbolo = consome_token();
-			if simbolo != VAIDEN {
-				println!("statm: ERRO, VAIDEN ESPERADO!");
+			if (simbolo != VAIDEN) && (simbolo != IDEN) {
+				println!("statm: ERRO, VAIDEN OU IDEN ESPERADO!");
 				return;
 			}
 			infipo();
