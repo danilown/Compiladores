@@ -95,10 +95,31 @@ pub fn asd(){
 
 }
 
+static mut index:  usize = 0;
+
+fn consome_token() -> Token {
+	let val = tabelaSimbolos.lock().unwrap().len();
+	if index == (val as usize) - 1 {
+		println!("ERRO! FIM INESPERADO DO ARQUIVO!");
+		return;
+	}
+	let ref temp = tabelaSimbolos.lock().unwrap()[index];
+	index += 1;
+
+	*temp
+}
+
+fn recebe_token() -> Token {
+	let ref temp = tabelaSimbolos.lock().unwrap()[index];
+
+	*temp
+}
+
+
 pub fn sitype() {
 	let mut simbolo;
 
-	simbolo = recebe_token();
+	simbolo = recebe_token().tok;
 	match simbolo {
 		TYIDEN => {
 			consome_token();

@@ -1,3 +1,5 @@
+use std::process::Command;
+
 mod Lexico;
 mod Sintatico;
 mod Semantico;

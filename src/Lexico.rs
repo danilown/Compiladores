@@ -7,7 +7,6 @@ use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use std::process::Command;
 use std::convert::From;
 use std::char::*;
 use std::sync::Mutex;
@@ -107,7 +106,7 @@ const FLOAT:    u32 = 84; // FLoat Numbers
 static mut escopo: u32 =  0;
 static mut next:   u32 =  0;
 lazy_static! {
-    static ref tabelaSimbolos: Mutex<Vec<Token>> = Mutex::new(Vec::new());
+    pub static ref tabelaSimbolos: Mutex<Vec<Token>> = Mutex::new(Vec::new());
 }
 
 #[derive(Debug)]
@@ -607,7 +606,7 @@ unsafe{
 
 
 
-fn setupLexico() {
+pub fn setupLexico() {
     
    // let mut atual = Token{tok: ("").to_string(), tipe: 0 , line: 0, row: 0, escope: 0, used: false};
     let mut result = SimbolTable();
