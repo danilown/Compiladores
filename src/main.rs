@@ -1,22 +1,15 @@
+#[macro_use]
+extern crate lazy_static;
 use std::process::Command;
 
-mod Lexico;
+// pub mod Lexico;
 mod Sintatico;
-mod Semantico;
+// mod Semantico;
+
 
 fn main() {
     
-    Lexico::setupLexico();
-
-    let val = Lexico::tabelaSimbolos.lock().unwrap().len();
-
-    for i in 0..val {
- 
-        let ref temp = Lexico::tabelaSimbolos.lock().unwrap()[i];
-
-        println!("{:?}",*temp);
-
-    }
+    Sintatico::asd();
 
     let _ = Command::new("cmd.exe").arg("/c").arg("pause").status();
 }

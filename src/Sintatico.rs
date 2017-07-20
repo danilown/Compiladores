@@ -90,36 +90,49 @@ const TYIDEN:   u32 = 71; // type identifier
 const PRIDEN:   u32 = 72; // procedure identifier
 const FLOAT:    u32 = 84; // FLoat Numbers
 
+mod Lexico;
 
-pub fn asd(){
+pub fn asd() {
+	Lexico::setupLexico();
 
+    let val = Lexico::tabelaSimbolos.lock().unwrap().len();
+
+    for i in 0..val {
+ 
+        let ref temp = Lexico::tabelaSimbolos.lock().unwrap()[i];
+
+        println!("{:?}",*temp);
+
+    }
+
+	program();
 }
 
-static mut index:  usize = 0;
+static mut indice:  usize = 0;
 
-fn consome_token() -> Token {
-	let val = tabelaSimbolos.lock().unwrap().len();
-	if index == (val as usize) - 1 {
+fn consome_token() -> u32 {
+	let val = Lexico::tabelaSimbolos.lock().unwrap().len();
+	if indice == val - 1 {
 		println!("ERRO! FIM INESPERADO DO ARQUIVO!");
 		return;
 	}
-	let ref temp = tabelaSimbolos.lock().unwrap()[index];
-	index += 1;
+	let ref temp = Lexico::tabelaSimbolos.lock().unwrap()[indice];
+	indice += 1;
 
-	*temp
+	(*temp).tipe
 }
 
-fn recebe_token() -> Token {
-	let ref temp = tabelaSimbolos.lock().unwrap()[index];
+fn recebe_token() -> u32 {
+	let ref temp = Lexico::tabelaSimbolos.lock().unwrap()[indice];
 
-	*temp
+	(*temp).tipe
 }
 
 
 pub fn sitype() {
 	let mut simbolo;
 
-	simbolo = recebe_token().tok;
+	simbolo = recebe_token();
 	match simbolo {
 		TYIDEN => {
 			consome_token();

@@ -1,5 +1,3 @@
-#[macro_use]
-extern crate lazy_static;
 
 use std::{i8, i16, i32, i64, u8, u16, u32, u64, isize, usize, f32, f64};
 use std::io::stdin;
@@ -90,6 +88,7 @@ const simbolo_char:             u32 = 80;
 const simbolo_boolean:          u32 = 81;
 // nunca usado const simbolo_identifier:       u32 = 82;
 const simbolo_div:              u32 = 83;
+const simbolo_record:           u32 = 85;
 
 const NUMB:     u32 = 64; // number
 const STRING:   u32 = 65; // cadeia de caracteres
