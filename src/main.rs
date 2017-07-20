@@ -122,7 +122,7 @@ struct Token {
 
 fn SimbolTable<'a>() -> Vec<String> {
     
-  let mut file = File::open("/home/rodrigo/hello.pas").expect("Unable to open the file");
+  let mut file = File::open("src/hello.pas").expect("Unable to open the file");
   let mut contents = String::new();
   file.read_to_string(&mut contents).expect("Unable to read the file");
 
