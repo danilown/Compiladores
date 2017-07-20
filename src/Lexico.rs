@@ -116,7 +116,7 @@ pub struct Token {
 
 fn SimbolTable<'a>() -> Vec<String> {
     
-  let mut file = File::open("d:/compiladores/src/teste2.pas").expect("Unable to open the file");
+  let mut file = File::open("teste1.pas").expect("Unable to open the file");
   let mut contents = String::new();
   file.read_to_string(&mut contents).expect("Unable to read the file");
 
