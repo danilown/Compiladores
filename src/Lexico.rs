@@ -77,15 +77,9 @@ const simbolo_to:               u32 = 62;
 const simbolo_down_to:          u32 = 63;
 // ----------------------------------------
 // Adicionar no sintático:
-const simbolo_clrscr:           u32 = 73;
 const simbolo_abre_parenteses:  u32 = 74;
-const simbolo_integer:          u32 = 75;
-const simbolo_read:             u32 = 76;
-const simbolo_write:            u32 = 77;
-const simbolo_true:             u32 = 78;
+const simbolo_true:             u32 = 78; 
 const simbolo_false:            u32 = 79;
-const simbolo_char:             u32 = 80;
-const simbolo_boolean:          u32 = 81;
 // nunca usado const simbolo_identifier:       u32 = 82;
 const simbolo_div:              u32 = 83;
 const simbolo_record:           u32 = 85;
@@ -94,7 +88,7 @@ const NUMB:     u32 = 64; // number
 const STRING:   u32 = 65; // cadeia de caracteres
 const IDEN:     u32 = 66; // identifier
 const COIDEN:   u32 = 67; // constant identifier
-const FIIDEN:   u32 = 68; // filed identifier
+const FIIDEN:   u32 = 68; // field identifier
 const VAIDEN:   u32 = 69; // variable identifier
 const FUIDEN:   u32 = 70; // function identifier
 const TYIDEN:   u32 = 71; // type identifier
@@ -103,7 +97,9 @@ const FLOAT:    u32 = 84; // FLoat Numbers
 
 
 static mut escopo: u32 =  0;
+static mut lines:  u32 =  0;
 static mut next:   u32 =  0;
+
 lazy_static! {
     pub static ref tabelaSimbolos: Mutex<Vec<Token>> = Mutex::new(Vec::new());
 }
@@ -189,6 +185,7 @@ fn Organize(result: &mut Vec<String>) -> Vec<String>{
         }
 
         if result[i as usize] == "\n"{
+
             i += 1;
             continue
         }
@@ -329,10 +326,10 @@ fn Lexic(result: &mut Vec<String>, GoOn: bool) -> Token {
         "while", "do", "begin", "end", "read", "write", "var", "array", "func",
         "proc", "program", "true", "false", "char", "integer", "boolean", "clrscr", 
         "packed", "in", "dif", "file", "set", "case", "nil", "label", "const",
-        "type", "repeat", "for", "with", "goto", "until", "to", "downto"]; // 42 palavras reservadas
+        "type", "repeat", "for", "with", "goto", "until", "to", "downto", "writeln"];
 
     let simbolos = vec!["+", "-", "*", "=", "<", ">", "(", ")", // <> >= <= .. :=
-         "[", "]", ".", ",", ";", ":", "@", "\"", "/", "%", "..", "<>", ">=", "<=", ":="];    // 18 simbolos
+         "[", "]", ".", ",", ";", ":", "@", "\"", "/", "%", "..", "<>", ">=", "<=", ":="];    
 
     let numeros = vec!["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."];
 
@@ -451,31 +448,34 @@ unsafe{
                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_down_to, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "clrscr"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_clrscr, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "integer"{
                 classificada = 1;
                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "read"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_read, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "write"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_write, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "program"{
                 classificada = 1;
                 next_token = Token{tok: (result[next as usize]).to_string(), tipe: program, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "true"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_true, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: , line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "false"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_false, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: , line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "char"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_char, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: 0, row: 0, escope: escopo, used: false};
             }else if result[next as usize].to_lowercase() == "boolean"{
                 classificada = 1;
-                next_token = Token{tok: (result[next as usize]).to_string(), tipe: simbolo_boolean, line: 0, row: 0, escope: escopo, used: false};
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: TYIDEN, line: 0, row: 0, escope: escopo, used: false};
+            }else if result[next as usize].to_lowercase() == "writeln"{
+                classificada = 1;
+                next_token = Token{tok: (result[next as usize]).to_string(), tipe: FUIDEN, line: 0, row: 0, escope: escopo, used: false};
             }
 
         if(GoOn){
