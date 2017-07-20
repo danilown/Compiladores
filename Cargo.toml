@@ -1,6 +1,7 @@
 [package]
-name = "arquivos"
+name = "compiladores"
 version = "0.1.0"
 authors = ["diga1"]
 
 [dependencies]
+lazy_static = "0.2"
